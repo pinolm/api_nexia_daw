@@ -69,11 +69,17 @@ public class AuthController {
         .map(item -> item.getAuthority())
         .collect(Collectors.toList());
 
-    return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-        .body(new UserInfoResponse(userDetails.getId(),
+      String jwtTokenValue = jwtCookie.getValue();
+
+
+      UserInfoResponse userInfoResponse = new UserInfoResponse(userDetails.getId(),
                                    userDetails.getUsername(),
                                    userDetails.getEmail(),
-                                   roles));
+                                   roles, jwtTokenValue);
+
+                                   return ResponseEntity.ok()
+                                   .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                                   .body(userInfoResponse);
   }
 
   @PostMapping("/register")
