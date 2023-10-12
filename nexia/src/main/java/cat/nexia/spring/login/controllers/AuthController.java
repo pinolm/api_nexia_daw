@@ -4,9 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.validation.Valid;
-
 import cat.nexia.spring.login.models.ERole;
 import cat.nexia.spring.login.models.Role;
 import cat.nexia.spring.login.models.User;
@@ -30,14 +28,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import cat.nexia.spring.login.repository.RoleRepository;
 import cat.nexia.spring.login.repository.UserRepository;
 
+/**
+  * User authentication and registration handler provides entry points
+  * to authenticate users, register new users and log out of the application.
+  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+  
   @Autowired
   AuthenticationManager authenticationManager;
 
@@ -53,8 +55,14 @@ public class AuthController {
   @Autowired
   JwtUtils jwtUtils;
 
+  /**
+    * Authenticates the user and issues a JWT token for subsequent sessions.
+    *
+    * @param loginRequest The login details provided by the user.
+    * @return ResponseEntity with a JWT token and details of the authenticated user.
+    */
   @PostMapping("/login")
-  public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+  public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
 
     Authentication authentication = authenticationManager
         .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername().toLowerCase(),
@@ -72,7 +80,6 @@ public class AuthController {
 
       String jwtTokenValue = jwtCookie.getValue();
 
-
       UserInfoResponse userInfoResponse = new UserInfoResponse(userDetails.getId(),
                                    userDetails.getUsername(),
                                    userDetails.getEmail(),
@@ -83,6 +90,12 @@ public class AuthController {
                                    .body(userInfoResponse);
   }
 
+  /**
+    * Register a new user in the system with specific roles and permissions.
+    *
+    * @param signUpRequest The registration data provided by the new user.
+    * @return ResponseEntity with a success or error message.
+    */
   @PostMapping("/register")
   public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest signUpRequest) {
     if (userRepository.existsByUsername(signUpRequest.getUsername().toLowerCase())) {
@@ -134,6 +147,11 @@ public class AuthController {
     return ResponseEntity.ok(new MessageResponse("The user has been created successfully."));
   }
 
+  /**
+    * Logs out a user, invalidating the JWT token.
+    *
+    * @return ResponseEntity with a success message.
+    */
   @PostMapping("/logout")
   public ResponseEntity<?> logoutUser() {
     ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
