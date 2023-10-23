@@ -50,7 +50,7 @@ public class UserController {
     /**
      * Gets the list of users available in the system.
      *
-     * @return A list of {@link UserListResponse} objects with the users'
+     * @return A list of {@link UserListResponse} objects with the users
      *         information.
      */
     @GetMapping("/list")
