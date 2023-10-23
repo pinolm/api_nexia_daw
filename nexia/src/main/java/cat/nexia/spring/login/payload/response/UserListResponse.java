@@ -1,51 +1,43 @@
-package cat.nexia.spring.login.payload.request;
+package cat.nexia.spring.login.payload.response;
 
-import java.util.Set;
-
-import javax.validation.constraints.*;
-
-public class RegisterRequest {
-    @NotBlank
-    @Size(min = 3, max = 20)
+public class UserListResponse {
+    
+    private Long id;
     private String username;
-
-    @NotBlank
-    @Size(max = 50)
-    @Email
     private String email;
-
-    @NotBlank
-    @Size(min = 6, max = 40)
-    private String password;
-
-    @Size(max = 30)
     private String number;
-
-    @Size(max = 60)
     private String address;
-
-    @Size(max = 30)
     private String city;
-
-    @Size(max = 30)
     private String country;
-
-    @Size(max = 30)
     private String postalCode;
-
-    @Size(max = 10)
     private String gender;
-
-    @Size(max = 50)
     private String name;
-
-    @Size(max = 50)
     private String surname;
 
-    private Set<String> role;
+    public UserListResponse(Long id, String username, String email, String number, String address, String city, String country, String postalCode, String gender, String name, String surname) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.number = number;
+        this.address = address;
+        this.city = city;
+        this.country = country;
+        this.postalCode = postalCode;
+        this.gender = gender;
+        this.name = name;
+        this.surname = surname;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getUsername() {
-        return username;
+        return this.username;
     }
 
     public void setUsername(String username) {
@@ -53,23 +45,15 @@ public class RegisterRequest {
     }
 
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getNumber() {
-        return number;
+        return this.number;
     }
 
     public void setNumber(String number) {
@@ -77,7 +61,7 @@ public class RegisterRequest {
     }
 
     public String getAddress() {
-        return address;
+        return this.address;
     }
 
     public void setAddress(String address) {
@@ -85,7 +69,7 @@ public class RegisterRequest {
     }
 
     public String getCity() {
-        return city;
+        return this.city;
     }
 
     public void setCity(String city) {
@@ -93,7 +77,7 @@ public class RegisterRequest {
     }
 
     public String getCountry() {
-        return country;
+        return this.country;
     }
 
     public void setCountry(String country) {
@@ -101,7 +85,7 @@ public class RegisterRequest {
     }
 
     public String getPostalCode() {
-        return postalCode;
+        return this.postalCode;
     }
 
     public void setPostalCode(String postalCode) {
@@ -109,7 +93,7 @@ public class RegisterRequest {
     }
 
     public String getGender() {
-        return gender;
+        return this.gender;
     }
 
     public void setGender(String gender) {
@@ -117,7 +101,7 @@ public class RegisterRequest {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -125,18 +109,10 @@ public class RegisterRequest {
     }
 
     public String getSurname() {
-        return surname;
+        return this.surname;
     }
 
     public void setSurname(String surname) {
         this.surname = surname;
-    }
-
-    public Set<String> getRole() {
-        return this.role;
-    }
-
-    public void setRole(Set<String> role) {
-        this.role = role;
     }
 }
