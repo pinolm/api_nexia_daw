@@ -20,6 +20,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
+
+ /**
+    * Security settings for the application.
+    * Responsible for configuring authentication, authorization and session management.
+*/
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
@@ -33,6 +38,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
+    /**
+      * Defines a custom JWT authentication filter as a bean.
+      * @return A JWT authentication filter.
+      */
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
@@ -43,17 +52,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
+    /**
+      * Configure and expose the authentication manager as a bean.
+      * @return An authentication manager.
+      * @throws Exception If an error occurs while configuring the authentication manager.
+      */
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
+    /**
+      * Set the password encoder for the app.
+      * @return A BCrypt-based password scrambler.
+      */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // List of routes that do not require authentication
     private static final String[] AUTH_WHITELIST = {
             "/authenticate",
             "/swagger-ui.html",
