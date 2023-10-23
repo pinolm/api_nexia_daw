@@ -23,9 +23,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
-        // securedEnabled = true,
+         securedEnabled = true
         // jsr250Enabled = true,
-        prePostEnabled = true)
+        //prePostEnabled = true
+        // )
+)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
@@ -79,8 +81,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         // disable page caching
         http.headers().cacheControl();
-
     }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources/**",
+                "/configuration/security", "/swagger-ui.html", "/webjars/**", "/v2/swagger.json");
+    }
+
+
 
 
 }
