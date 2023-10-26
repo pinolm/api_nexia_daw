@@ -1,0 +1,46 @@
+package cat.nexia.spring.repository;
+
+import cat.nexia.spring.models.Reserva;
+import cat.nexia.spring.models.dto.ReservaDto;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface ReservaRepository extends JpaRepository<Reserva, Long> {
+
+    List <Reserva> findReservaByDia(LocalDate dia);
+
+    List<Reserva> findAll ();
+
+    Reserva findReservaByIdReserva(Long idReserva);
+
+     Reserva findReservaByIdPistaAndIdHorariAndDia(Long idPista, Long idHorari, LocalDate dia);
+
+    @Modifying
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Query(value = "INSERT INTO nexia.reserva (id_pista,id_horari,id_usuari,dia) values (?1, ?2, ?3, ?4)",
+            nativeQuery = true)
+    void insertarReserva (Long idPista, Long idHorari, Long idUsuari, LocalDate dia);
+
+    @Modifying
+    @Transactional(propagation = Propagation.REQUIRED)
+    void deleteReservaByIdReserva (Long idReserva);
+
+
+
+
+
+
+
+    
+}
