@@ -17,7 +17,7 @@ public class NexiaUtils {
         return null;
     }
 
-    public static StringWriter getStringWriter(ReflectiveOperationException e) {
+    public static StringWriter getStringWriter(Exception e) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);

@@ -1,10 +1,7 @@
 package cat.nexia.spring.security.jwt;
 
-import java.util.Date;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
+import cat.nexia.spring.security.services.UserDetailsImpl;
+import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,8 +9,9 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
-import cat.nexia.spring.security.services.UserDetailsImpl;
-import io.jsonwebtoken.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 /**
  * Utility class for managing JWT tokens in security application.

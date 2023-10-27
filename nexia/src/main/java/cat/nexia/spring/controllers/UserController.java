@@ -1,35 +1,27 @@
 package cat.nexia.spring.controllers;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import cat.nexia.spring.models.ERole;
 import cat.nexia.spring.models.Role;
+import cat.nexia.spring.models.User;
+import cat.nexia.spring.payload.request.CreateUserRequest;
 import cat.nexia.spring.payload.request.UpdateUserRequest;
 import cat.nexia.spring.payload.response.MessageResponse;
+import cat.nexia.spring.payload.response.UserListResponse;
+import cat.nexia.spring.repository.RoleRepository;
 import cat.nexia.spring.repository.UserRepository;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
-import cat.nexia.spring.payload.response.UserListResponse;
-import cat.nexia.spring.repository.RoleRepository;
-import cat.nexia.spring.models.User;
-import cat.nexia.spring.payload.request.CreateUserRequest;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Controller to manage CRUD operations related to users.

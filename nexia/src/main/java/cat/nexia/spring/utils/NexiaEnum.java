@@ -7,7 +7,9 @@ public enum NexiaEnum {
 
     ID_ERROR(2, "No existe la Reserva con id: "),
 
-    RESERVA_DELETE_INFO (3, "S'ha elimininat correctament la reserva")
+    RESERVA_DELETE_INFO (3, "S'ha elimininat correctament la reserva"),
+
+    SEND_MAIL(4, "Missatge enviat a ")
 
 
 

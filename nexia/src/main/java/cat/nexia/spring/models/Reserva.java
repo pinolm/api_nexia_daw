@@ -1,16 +1,21 @@
 package cat.nexia.spring.models;
 
+import java.io.Serializable;
 import java.time.LocalDate;
-
+import java.util.Date;
 import java.util.Objects;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "reserva")
-public class Reserva   {
+@Table(name = "reserva" /*, uniqueConstraints={@UniqueConstraint(columnNames={"id_pista","id_horari","dia"})}*/)
+//@SequenceGenerator(name = "reserva_id_seq", sequenceName = "reserva_id_seq", allocationSize = 1)
+public class Reserva implements Serializable  {
 
+    private static final long serialVersionUID = -5144613821559613440L;
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reserva_id_seq")
+    @GeneratedValue(strategy = GenerationType.IDENTITY/*, generator = "reserva_id_seq"*/)
     @Column(name = "id_reserva")
     private Long idReserva;
 
@@ -25,6 +30,7 @@ public class Reserva   {
 
     @Column(name = "dia")
     private LocalDate dia;
+
 
     @ManyToOne
     @JoinColumn(name = "id_pista", insertable = false, updatable = false)

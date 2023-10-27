@@ -1,10 +1,5 @@
 package cat.nexia.spring.controllers;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
 import cat.nexia.spring.models.ERole;
 import cat.nexia.spring.models.Role;
 import cat.nexia.spring.models.User;
@@ -12,9 +7,10 @@ import cat.nexia.spring.payload.request.LoginRequest;
 import cat.nexia.spring.payload.request.RegisterRequest;
 import cat.nexia.spring.payload.response.MessageResponse;
 import cat.nexia.spring.payload.response.UserInfoResponse;
+import cat.nexia.spring.repository.RoleRepository;
+import cat.nexia.spring.repository.UserRepository;
 import cat.nexia.spring.security.jwt.JwtUtils;
 import cat.nexia.spring.security.services.UserDetailsImpl;
-import cat.nexia.spring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -24,12 +20,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import cat.nexia.spring.repository.RoleRepository;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
   * User authentication and registration handler provides entry points

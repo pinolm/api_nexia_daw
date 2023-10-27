@@ -1,5 +1,7 @@
 package cat.nexia.spring.controllers;
 
+import cat.nexia.spring.mail.SendMail;
+import cat.nexia.spring.mail.StringMails;
 import cat.nexia.spring.models.Reserva;
 import cat.nexia.spring.models.dto.ReservaDto;
 import cat.nexia.spring.payload.response.MessageResponse;
@@ -22,6 +24,9 @@ public class ReservaController {
 
     @Autowired
     private ReservaService reservaService;
+
+    @Autowired
+    private SendMail sendMail;
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern(NexiaEnum.DATA_TIME_FORMAT.getPhrase());
 
@@ -86,12 +91,18 @@ public class ReservaController {
             reservaService.guardarReserva(reserva);
             Reserva guardada = reservaService.findReservaByIdPistaAndIdHorariAndDia(reserva);
             if(reserva!=null){
+                //SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ
+                sendMail.sendEmailHtml("josep.faneca@outlook.es", null, null, "TEST", StringMails.mailPedido);
                 return new ResponseEntity<>(guardada, HttpStatus.OK);
-            } else {
+            }else {
+                //SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ
+                sendMail.sendEmailHtml("josep.faneca@outlook.es", null, null, "TEST", StringMails.mailPedido);
                 return new ResponseEntity<>(reserva, HttpStatus.OK);
             }
+
         } catch (Exception e) {
             if(NexiaUtils.psqlException(e) != null){
+
                 return new ResponseEntity<>(new MessageResponse(NexiaUtils.psqlException(e)), HttpStatus.INTERNAL_SERVER_ERROR);
             }
             return new ResponseEntity<>(new MessageResponse(e.getMessage()) , HttpStatus.INTERNAL_SERVER_ERROR);
@@ -121,6 +132,8 @@ public class ReservaController {
             if (reservaDto != null) {
                 reservaDto.setInfo(NexiaEnum.RESERVA_DELETE_INFO.getPhrase());
                 reservaService.eliminarReservaById(idReserva);
+                //SI ELIMINA, ENVIAR EMAIL AMB CONFIRMACIÓ
+                sendMail.sendEmailHtml("josep.faneca@outlook.es", null, null, "TEST", StringMails.mailPedido);
                 return new ResponseEntity<>(reservaDto, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(new MessageResponse(NexiaEnum.ID_ERROR.getPhrase() + idReserva), HttpStatus.INTERNAL_SERVER_ERROR);

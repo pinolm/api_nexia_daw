@@ -1,11 +1,12 @@
 package cat.nexia.spring.models;
 
-import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users",
@@ -13,7 +14,9 @@ import javax.validation.constraints.Size;
            @UniqueConstraint(columnNames = "username"),
            @UniqueConstraint(columnNames = "email")
        })
-public class User {
+public class User implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
