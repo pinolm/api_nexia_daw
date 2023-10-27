@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
  * Controller to manage CRUD operations related to users.
  */
 @RestController
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api/user")
 public class UserController {
 
