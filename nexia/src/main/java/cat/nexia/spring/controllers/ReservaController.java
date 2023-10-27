@@ -85,8 +85,8 @@ public class ReservaController {
      *
      */
 
-    @PostMapping("/guardar")
-    public ResponseEntity<Object> guardarReserva(@RequestBody Reserva reserva){
+    @PostMapping("/createReserva")
+    public ResponseEntity<Object> createReserva(@RequestBody Reserva reserva){
         try {
             reservaService.guardarReserva(reserva);
             Reserva guardada = reservaService.findReservaByIdPistaAndIdHorariAndDia(reserva);
@@ -125,8 +125,8 @@ public class ReservaController {
         }
     }
 
-    @GetMapping ("/eliminarReserva/{idReserva}")
-    public ResponseEntity<Object> eliminarReservaById (@PathVariable("idReserva") Long idReserva) {
+    @DeleteMapping("/deleteReserva/{idReserva}")
+    public ResponseEntity<Object> deleteReservaById (@PathVariable("idReserva") Long idReserva) {
         try {
             ReservaDto reservaDto = reservaService.findReservaById(idReserva);
             if (reservaDto != null) {
