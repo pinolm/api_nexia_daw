@@ -1,4 +1,4 @@
-package cat.nexia.spring.models.dto;
+package cat.nexia.spring.dto.response;
 
 import java.time.LocalDate;
 import java.util.Objects;

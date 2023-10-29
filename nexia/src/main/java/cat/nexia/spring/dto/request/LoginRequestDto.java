@@ -1,8 +1,8 @@
-package cat.nexia.spring.payload.request;
+package cat.nexia.spring.dto.request;
 
 import javax.validation.constraints.NotBlank;
 
-public class LoginRequest {
+public class LoginRequestDto {
 	@NotBlank
 	private String username;
 

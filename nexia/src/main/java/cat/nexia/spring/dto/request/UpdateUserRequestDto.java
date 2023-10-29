@@ -1,8 +1,8 @@
-package cat.nexia.spring.payload.request;
+package cat.nexia.spring.dto.request;
 
 import javax.validation.constraints.Size;
 
-public class UpdateUserRequest {
+public class UpdateUserRequestDto {
 
     @Size(max = 50)
     private String name;
@@ -22,7 +22,6 @@ public class UpdateUserRequest {
     private String gender;
     @Size(max = 50)
     private String password;
-
 
     public String getName() {
         return name;

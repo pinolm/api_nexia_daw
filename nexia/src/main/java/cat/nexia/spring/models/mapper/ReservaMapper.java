@@ -1,7 +1,8 @@
 package cat.nexia.spring.models.mapper;
 
+import cat.nexia.spring.dto.response.ReservaDto;
 import cat.nexia.spring.models.Reserva;
-import cat.nexia.spring.models.dto.ReservaDto;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -1,11 +1,11 @@
-package cat.nexia.spring.payload.request;
+package cat.nexia.spring.dto.request;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
-public class RegisterRequest {
+public class RegisterRequestDto {
     @NotBlank
     @Size(min = 3, max = 20)
     private String username;

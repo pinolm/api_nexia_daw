@@ -1,12 +1,12 @@
 package cat.nexia.spring.controllers;
 
+import cat.nexia.spring.dto.request.CreateUserRequestDto;
+import cat.nexia.spring.dto.request.UpdateUserRequestDto;
+import cat.nexia.spring.dto.response.MessageResponseDto;
+import cat.nexia.spring.dto.response.UserListResponseDto;
 import cat.nexia.spring.models.ERole;
 import cat.nexia.spring.models.Role;
 import cat.nexia.spring.models.User;
-import cat.nexia.spring.payload.request.CreateUserRequest;
-import cat.nexia.spring.payload.request.UpdateUserRequest;
-import cat.nexia.spring.payload.response.MessageResponse;
-import cat.nexia.spring.payload.response.UserListResponse;
 import cat.nexia.spring.repository.RoleRepository;
 import cat.nexia.spring.repository.UserRepository;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -43,17 +43,17 @@ public class UserController {
     /**
      * Gets the list of users available in the system.
      *
-     * @return A list of {@link UserListResponse} objects with the users
+     * @return A list of {@link UserListResponseDto} objects with the users
      *         information.
      */
     @GetMapping("/list")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public List<UserListResponse> userList() {
+    public List<UserListResponseDto> userList() {
         List<User> users = userRepository.findAll();
 
-        List<UserListResponse> userResponses = users.stream()
-                .map(user -> new UserListResponse(
+        List<UserListResponseDto> userResponses = users.stream()
+                .map(user -> new UserListResponseDto(
                         user.getId(),
                         user.getUsername(),
                         user.getEmail(),
@@ -85,10 +85,10 @@ public class UserController {
         if (user == null) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body(new MessageResponse("Usuario no encontrado. Por favor, introduzca un ID válido."));
+                    .body(new MessageResponseDto("Usuario no encontrado. Por favor, introduzca un ID válido."));
         }
 
-        UserListResponse response = new UserListResponse(
+        UserListResponseDto response = new UserListResponseDto(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
@@ -118,11 +118,11 @@ public class UserController {
         if (user == null) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body(new MessageResponse(
+                    .body(new MessageResponseDto(
                             "Usuario no encontrado. Por favor, introduzca un nombre de usuario válido."));
         }
 
-        UserListResponse response = new UserListResponse(
+        UserListResponseDto response = new UserListResponseDto(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
@@ -148,19 +148,19 @@ public class UserController {
      */
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> createUser(@RequestBody CreateUserRequest createUserRequest,
+    public ResponseEntity<?> createUser(@RequestBody CreateUserRequestDto createUserRequest,
             UriComponentsBuilder ucBuilder) {
 
         if (userRepository.existsByUsername(createUserRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: El nombre de usuario ya está en uso!"));
+                    .body(new MessageResponseDto("Error: El nombre de usuario ya está en uso!"));
         }
 
         if (userRepository.existsByEmail(createUserRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: El correo electrónico ya está en uso!"));
+                    .body(new MessageResponseDto("Error: El correo electrónico ya está en uso!"));
         }
 
         User user = new User(createUserRequest.getUsername(), createUserRequest.getEmail(),
@@ -194,7 +194,7 @@ public class UserController {
         userRepository.save(user);
 
         return ResponseEntity.created(ucBuilder.path("/api/users/{id}").buildAndExpand(user.getId()).toUri())
-                .body(new MessageResponse("Usuario creado exitosamente!"));
+                .body(new MessageResponseDto("Usuario creado exitosamente!"));
     }
 
     /**
@@ -213,12 +213,12 @@ public class UserController {
         if (user == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: Usuario no encontrado."));
+                    .body(new MessageResponseDto("Error: Usuario no encontrado."));
         }
 
         userRepository.delete(user);
 
-        return ResponseEntity.ok(new MessageResponse("Usuario eliminado exitosamente."));
+        return ResponseEntity.ok(new MessageResponseDto("Usuario eliminado exitosamente."));
     }
 
     /**
@@ -235,12 +235,12 @@ public class UserController {
         if (user == null) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body(new MessageResponse("Usuario no encontrado. Por favor, introduzca un ID válido."));
+                    .body(new MessageResponseDto("Usuario no encontrado. Por favor, introduzca un ID válido."));
         }
 
         userRepository.delete(user);
 
-        return ResponseEntity.ok(new MessageResponse("Usuario eliminado exitosamente."));
+        return ResponseEntity.ok(new MessageResponseDto("Usuario eliminado exitosamente."));
     }
 
     /**
@@ -253,14 +253,14 @@ public class UserController {
      */
     @PutMapping("/update/{userId}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateUser(@PathVariable Long userId, @RequestBody UpdateUserRequest updateUserRequest) {
+    public ResponseEntity<?> updateUser(@PathVariable Long userId, @RequestBody UpdateUserRequestDto updateUserRequest) {
 
         User user = userRepository.findById(userId).orElse(null);
 
         if (user == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: El usuario no existe."));
+                    .body(new MessageResponseDto("Error: El usuario no existe."));
         }
 
         if (updateUserRequest.getName() != null) {
@@ -303,7 +303,7 @@ public class UserController {
 
         userRepository.save(user);
 
-        return ResponseEntity.ok(new MessageResponse("Usuario actualizado exitosamente."));
+        return ResponseEntity.ok(new MessageResponseDto("Usuario actualizado exitosamente."));
     }
 
 }

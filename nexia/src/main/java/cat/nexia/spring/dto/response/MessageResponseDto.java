@@ -1,9 +1,9 @@
-package cat.nexia.spring.payload.response;
+package cat.nexia.spring.dto.response;
 
-public class MessageResponse {
+public class MessageResponseDto {
 	private String message;
 
-	public MessageResponse(String message) {
+	public MessageResponseDto(String message) {
 	    this.message = message;
 	  }
 

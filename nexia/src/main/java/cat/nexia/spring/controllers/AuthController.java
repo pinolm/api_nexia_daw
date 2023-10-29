@@ -1,12 +1,12 @@
 package cat.nexia.spring.controllers;
 
+import cat.nexia.spring.dto.request.LoginRequestDto;
+import cat.nexia.spring.dto.request.RegisterRequestDto;
+import cat.nexia.spring.dto.response.MessageResponseDto;
+import cat.nexia.spring.dto.response.UserInfoResponseDto;
 import cat.nexia.spring.models.ERole;
 import cat.nexia.spring.models.Role;
 import cat.nexia.spring.models.User;
-import cat.nexia.spring.payload.request.LoginRequest;
-import cat.nexia.spring.payload.request.RegisterRequest;
-import cat.nexia.spring.payload.response.MessageResponse;
-import cat.nexia.spring.payload.response.UserInfoResponse;
 import cat.nexia.spring.repository.RoleRepository;
 import cat.nexia.spring.repository.UserRepository;
 import cat.nexia.spring.security.jwt.JwtUtils;
@@ -59,7 +59,7 @@ public class AuthController {
     * @return ResponseEntity with a JWT token and details of the authenticated user.
     */
   @PostMapping("/login")
-  public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
+  public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequestDto loginRequest) {
 
     Authentication authentication = authenticationManager
         .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername().toLowerCase(),
@@ -77,7 +77,7 @@ public class AuthController {
 
       String jwtTokenValue = jwtCookie.getValue();
 
-      UserInfoResponse userInfoResponse = new UserInfoResponse(userDetails.getId(),
+      UserInfoResponseDto userInfoResponse = new UserInfoResponseDto(userDetails.getId(),
                                    userDetails.getUsername(),
                                    userDetails.getEmail(),
                                    roles, jwtTokenValue);
@@ -94,13 +94,13 @@ public class AuthController {
     * @return ResponseEntity with a success or error message.
     */
   @PostMapping("/register")
-  public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest signUpRequest) {
+  public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequestDto signUpRequest) {
     if (userRepository.existsByUsername(signUpRequest.getUsername().toLowerCase())) {
-      return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+      return ResponseEntity.badRequest().body(new MessageResponseDto("Error: Username is already taken!"));
     }
 
     if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-      return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+      return ResponseEntity.badRequest().body(new MessageResponseDto("Error: Email is already in use!"));
     }
 
     // Create new user's account
@@ -141,7 +141,7 @@ public class AuthController {
     user.setRoles(roles);
     userRepository.save(user);
 
-    return ResponseEntity.ok(new MessageResponse("The user has been created successfully."));
+    return ResponseEntity.ok(new MessageResponseDto("The user has been created successfully."));
   }
 
   /**
@@ -153,6 +153,6 @@ public class AuthController {
   public ResponseEntity<?> logoutUser() {
     ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
     return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
-        .body(new MessageResponse("the user has successfully logged out"));
+        .body(new MessageResponseDto("the user has successfully logged out"));
   }
 }

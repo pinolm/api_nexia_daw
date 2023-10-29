@@ -1,15 +1,15 @@
-package cat.nexia.spring.payload.response;
+package cat.nexia.spring.dto.response;
 
 import java.util.List;
 
-public class UserInfoResponse {
+public class UserInfoResponseDto {
     private Long id;
     private String username;
     private String email;
     private List<String> roles;
     private String token; 
 
-    public UserInfoResponse(Long id, String username, String email, List<String> roles, String token) {
+    public UserInfoResponseDto(Long id, String username, String email, List<String> roles, String token) {
         this.id = id;
         this.username = username;
         this.email = email;

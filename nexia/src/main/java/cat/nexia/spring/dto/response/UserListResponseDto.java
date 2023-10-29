@@ -1,6 +1,6 @@
-package cat.nexia.spring.payload.response;
+package cat.nexia.spring.dto.response;
 
-public class UserListResponse {
+public class UserListResponseDto {
     
     private Long id;
     private String username;
@@ -14,7 +14,7 @@ public class UserListResponse {
     private String name;
     private String surname;
 
-    public UserListResponse(Long id, String username, String email, String number, String address, String city, String country, String postalCode, String gender, String name, String surname) {
+    public UserListResponseDto(Long id, String username, String email, String number, String address, String city, String country, String postalCode, String gender, String name, String surname) {
         this.id = id;
         this.username = username;
         this.email = email;

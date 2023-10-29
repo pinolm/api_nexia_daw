@@ -1,7 +1,7 @@
 package cat.nexia.spring.service;
 
+import cat.nexia.spring.dto.response.ReservaDto;
 import cat.nexia.spring.models.Reserva;
-import cat.nexia.spring.models.dto.ReservaDto;
 
 import java.time.LocalDate;
 import java.util.List;
