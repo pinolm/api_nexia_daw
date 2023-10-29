@@ -1,5 +1,6 @@
 package cat.nexia.spring.controllers;
 
+import cat.nexia.spring.dto.response.AllReservasResponseDto;
 import cat.nexia.spring.dto.response.MessageResponseDto;
 import cat.nexia.spring.dto.response.ReservaDto;
 import cat.nexia.spring.mail.SendMail;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -36,7 +36,7 @@ public class ReservaController {
      *
      * @param dia The day of the reserva to search for.
      * @return A response containing the reserva information if found,
-     * or an error message if the reserva does not exist.
+     *         or an error message if the reserva does not exist.
      */
     @GetMapping("/findByDia/{dia}")
     public ResponseEntity<Object> findReservaByDia(@PathVariable("dia") String dia) {
@@ -57,16 +57,18 @@ public class ReservaController {
     }
 
     /**
-     * Search for all reservas.
+     * Recovers all available reservations.
      *
-     *
-     * @return A response containing the list of all reserva information if found,
-     * or an empty list if the table not contains data.
+     * @return ResponseEntity containing the list of reservations with status
+     *         HttpStatus.OK if the operation is successful.
+     *         On error, returns an error message with status
+     *         HttpStatus.INTERNAL_SERVER_ERROR.
      */
     @GetMapping("/findAll")
-    public ResponseEntity<Object> findAllReserves(){
+    public ResponseEntity<Object> findAllReserves() {
         try {
-            return new ResponseEntity<>(reservaService.findAll(), HttpStatus.OK);
+            List<AllReservasResponseDto> reservas = reservaService.findAll();
+            return new ResponseEntity<>(reservas, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("ERROR: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -76,37 +78,39 @@ public class ReservaController {
      * Search for all reservas.
      *
      * @param reserva information like this:
-     *          "idPista": 2,
-     *         "idHorari": 6,
-     *         "idUsuari": 5,
-     *         "dia": "2023-11-01"
+     *                "idPista": 2,
+     *                "idHorari": 6,
+     *                "idUsuari": 5,
+     *                "dia": "2023-11-01"
      * @return A response containing the reserva information if found
-     * @exception Exception: si la excepción es de tipoPSQLException devuelve: ERROR: llave duplicada
-     * viola restricción de unicidad «reserva_unique»
+     * @exception Exception: si la excepción es de tipoPSQLException devuelve:
+     *                       ERROR: llave duplicada
+     *                       viola restricción de unicidad «reserva_unique»
      *
      */
 
     @PostMapping("/createReserva")
-    public ResponseEntity<Object> createReserva(@RequestBody Reserva reserva){
+    public ResponseEntity<Object> createReserva(@RequestBody Reserva reserva) {
         try {
             reservaService.guardarReserva(reserva);
             Reserva guardada = reservaService.findReservaByIdPistaAndIdHorariAndDia(reserva);
-            if(reserva!=null){
-                //SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ
-                sendMail.sendEmailHtml("cristianmp17@hotmail.com", null, null, "TEST", StringMails.mailPedido);
+            if (reserva != null) {
+                // SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ
+                sendMail.sendEmailHtml("correuvostre@hotmail.com", null, null, "TEST", StringMails.mailPedido);
                 return new ResponseEntity<>(guardada, HttpStatus.OK);
-            }else {
-                //SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ
-                sendMail.sendEmailHtml("cristianmp17@hotmail.com", null, null, "TEST", StringMails.mailPedido);
+            } else {
+                // SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ
+                sendMail.sendEmailHtml("correuvostre@hotmail.com", null, null, "TEST", StringMails.mailPedido);
                 return new ResponseEntity<>(reserva, HttpStatus.OK);
             }
 
         } catch (Exception e) {
-            if(NexiaUtils.psqlException(e) != null){
+            if (NexiaUtils.psqlException(e) != null) {
 
-                return new ResponseEntity<>(new MessageResponseDto(NexiaUtils.psqlException(e)), HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(new MessageResponseDto(NexiaUtils.psqlException(e)),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            return new ResponseEntity<>(new MessageResponseDto(e.getMessage()) , HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new MessageResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -115,10 +119,10 @@ public class ReservaController {
      *
      * @param idReserva The if of the reserva to search for.
      * @return A response containing the reserva information if found,
-     * or an error message if the reserva does not exist.
+     *         or an error message if the reserva does not exist.
      */
     @GetMapping("/reservaById/{idReserva}")
-    public ResponseEntity<Object> reservaById (@PathVariable("idReserva") Long idReserva) {
+    public ResponseEntity<Object> reservaById(@PathVariable("idReserva") Long idReserva) {
         try {
             return new ResponseEntity<>(reservaService.findReservaById(idReserva), HttpStatus.OK);
         } catch (Exception e) {
@@ -127,24 +131,23 @@ public class ReservaController {
     }
 
     @DeleteMapping("/deleteReserva/{idReserva}")
-    public ResponseEntity<Object> deleteReservaById (@PathVariable("idReserva") Long idReserva) {
+    public ResponseEntity<Object> deleteReservaById(@PathVariable("idReserva") Long idReserva) {
         try {
             ReservaDto reservaDto = reservaService.findReservaById(idReserva);
             if (reservaDto != null) {
                 reservaDto.setInfo(NexiaEnum.RESERVA_DELETE_INFO.getPhrase());
                 reservaService.eliminarReservaById(idReserva);
-                //SI ELIMINA, ENVIAR EMAIL AMB CONFIRMACIÓ
-                sendMail.sendEmailHtml("cristianmp17@hotmail.com", null, null, "TEST", StringMails.mailPedido);
+                // SI ELIMINA, ENVIAR EMAIL AMB CONFIRMACIÓ
+                sendMail.sendEmailHtml("correuvostre@hotmail.com", null, null, "TEST", StringMails.mailPedido);
                 return new ResponseEntity<>(reservaDto, HttpStatus.OK);
             } else {
-                return new ResponseEntity<>(new MessageResponseDto(NexiaEnum.ID_ERROR.getPhrase() + idReserva), HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(new MessageResponseDto(NexiaEnum.ID_ERROR.getPhrase() + idReserva),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
-
-
 
 }

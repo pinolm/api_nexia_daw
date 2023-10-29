@@ -1,5 +1,6 @@
 package cat.nexia.spring.service;
 
+import cat.nexia.spring.dto.response.AllReservasResponseDto;
 import cat.nexia.spring.dto.response.ReservaDto;
 import cat.nexia.spring.models.Reserva;
 
@@ -10,7 +11,7 @@ public interface ReservaService {
 
     List<Reserva> findReservaByDia (LocalDate dia);
 
-    List<Reserva> findAll ();
+   List<AllReservasResponseDto> findAll();
 
     ReservaDto findReservaById (Long idReserva);
 
