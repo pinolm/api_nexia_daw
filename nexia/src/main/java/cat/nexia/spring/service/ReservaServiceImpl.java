@@ -1,5 +1,6 @@
 package cat.nexia.spring.service;
 
+import cat.nexia.spring.dto.response.AllReservasByDiaResponse;
 import cat.nexia.spring.dto.response.AllReservasResponseDto;
 import cat.nexia.spring.dto.response.ReservaDto;
 import cat.nexia.spring.dto.response.UserSimpleDto;
@@ -9,6 +10,7 @@ import cat.nexia.spring.repository.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,5 +74,6 @@ public class ReservaServiceImpl implements ReservaService {
     public void eliminarReservaById(Long idReserva) {
         reservaRepository.deleteReservaByIdReserva(idReserva);
     }
+
 
 }

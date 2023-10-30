@@ -1,5 +1,6 @@
 package cat.nexia.spring.controllers;
 
+import cat.nexia.spring.dto.response.AllReservasByDiaResponse;
 import cat.nexia.spring.dto.response.AllReservasResponseDto;
 import cat.nexia.spring.dto.response.MessageResponseDto;
 import cat.nexia.spring.dto.response.ReservaDto;
@@ -15,8 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -32,11 +35,14 @@ public class ReservaController {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern(NexiaEnum.DATA_TIME_FORMAT.getPhrase());
 
     /**
-     * Search for a reserva by day.
+     * Retrieves and returns a list of reservations for the specified date.
      *
-     * @param dia The day of the reserva to search for.
-     * @return A response containing the reserva information if found,
-     *         or an error message if the reserva does not exist.
+     * @param day The date in "yyyy-MM-dd" format for which reservations will be
+     *            retrieved.
+     * @return ResponseEntity with the list of reservations in
+     *         AllReservasByDiaResponse format if reservations are found, or an
+     *         error message if there are no reservations or the date format is
+     *         incorrect.
      */
     @GetMapping("/findByDia/{dia}")
     public ResponseEntity<Object> findReservaByDia(@PathVariable("dia") String dia) {
@@ -49,7 +55,17 @@ public class ReservaController {
             LocalDate localDate = LocalDate.parse(dia, formatter);
             List<Reserva> reservaList = reservaService.findReservaByDia(localDate);
             if (reservaList != null && !reservaList.isEmpty()) {
-                return new ResponseEntity<>(reservaList, HttpStatus.OK);
+                // Mapeja las reservas al DTO AllReservasByDiaResponse
+                List<AllReservasByDiaResponse> responseList = reservaList.stream()
+                        .map(reserva -> new AllReservasByDiaResponse(
+                                reserva.getUser().getId(),
+                                reserva.getIdReserva(),
+                                reserva.getHorari().getIdHorari(),
+                                LocalTime.parse(reserva.getHorari().getIniHora()),
+                                reserva.getUser().getUsername()))
+                        .collect(Collectors.toList());
+
+                return new ResponseEntity<>(responseList, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("No existeixen reserves per al dia: " + dia, HttpStatus.OK);
             }
@@ -88,7 +104,6 @@ public class ReservaController {
      *                       viola restricción de unicidad «reserva_unique»
      *
      */
-
     @PostMapping("/createReserva")
     public ResponseEntity<Object> createReserva(@RequestBody Reserva reserva) {
         try {
