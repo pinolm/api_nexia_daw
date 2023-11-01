@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -48,18 +47,15 @@ public class JwtUtils {
   }
 
   /**
-   * Generates a JWT cookie from a UserDetailsImpl object.
+   * Generates a JWT cookie from the user details provided.
    *
-   * @param userPrincipal The UserDetailsImpl of the authenticated user.
+   * @param userPrincipal The UserDetailsImpl object of the authenticated user.
    * @return A ResponseCookie containing the JWT token.
    */
   public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
     String jwt = generateTokenFromUsername(userPrincipal.getUsername());
-    // Aquí puedes establecer el token JWT en lugar de una cookie
-    // Utiliza ResponseEntity para enviar la respuesta con el token JWT al cliente
     return ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(24 * 60 * 60).httpOnly(true).build();
-}
-
+  }
 
   /**
    * Gets an empty JWT cookie, used to delete the JWT cookie.

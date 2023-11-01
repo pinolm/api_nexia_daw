@@ -17,10 +17,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
- /**
-    * Security settings for the application.
-    * Responsible for configuring authentication, authorization and session management.
-*/
+/**
+ * Security settings for the application.
+ * Responsible for configuring authentication, authorization and session
+ * management.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
@@ -35,9 +36,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthEntryPointJwt unauthorizedHandler;
 
     /**
-      * Defines a custom JWT authentication filter as a bean.
-      * @return A JWT authentication filter.
-      */
+     * Defines a custom JWT authentication filter as a bean.
+     * 
+     * @return A JWT authentication filter.
+     */
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
@@ -49,10 +51,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
-      * Configure and expose the authentication manager as a bean.
-      * @return An authentication manager.
-      * @throws Exception If an error occurs while configuring the authentication manager.
-      */
+     * Configure and expose the authentication manager as a bean.
+     * 
+     * @return An authentication manager.
+     * @throws Exception If an error occurs while configuring the authentication
+     *                   manager.
+     */
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -60,9 +64,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
-      * Set the password encoder for the app.
-      * @return A BCrypt-based password scrambler.
-      */
+     * Set the password encoder for the app.
+     * 
+     * @return A BCrypt-based password scrambler.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -78,6 +83,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/webjars/**"
     };
 
+    /**
+     * Configure HTTP request security and authentication management in the
+     * application.
+     *
+     * @param http The security settings for HTTP requests.
+     * @throws Exception If an error occurs during security configuration.
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable();
@@ -86,11 +98,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
-                .antMatchers("/api/auth/**","/api/reserva/**").permitAll()
+                .antMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
-
 
 }

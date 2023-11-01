@@ -14,14 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-
+import org.springframework.security.core.Authentication;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * Controller to manage CRUD operations related to users.
@@ -41,19 +43,142 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
 
     /**
-     * Gets the list of users available in the system.
+     * Gets a list of users.
      *
-     * @return A list of {@link UserListResponseDto} objects with the users
-     *         information.
+     * This endpoint allows users with user or administrator roles to obtain a list
+     * of users registered on the system.
+     * Depending on the permissions of the user making the request, all users will
+     * be shown (if you are an administrator) or only
+     * your own profile details (if you are a regular user). If the user does not
+     * have the appropriate permissions to access the list
+     * of users, a 401 (Unauthorized) status code will be returned along with an
+     * error message.
+     *
+     * @return A ResponseEntity object containing a list of registered users or an
+     *         error message in case of missing permissions.
      */
     @GetMapping("/list")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public List<UserListResponseDto> userList() {
-        List<User> users = userRepository.findAll();
+    public ResponseEntity<?> userList() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        List<UserListResponseDto> userResponses = users.stream()
-                .map(user -> new UserListResponseDto(
+        if (hasRoleAdmin(authentication)) {
+            List<User> users = userRepository.findAll();
+
+            List<UserListResponseDto> userResponses = users.stream()
+                    .map(user -> new UserListResponseDto(
+                            user.getId(),
+                            user.getUsername(),
+                            user.getEmail(),
+                            user.getNumber(),
+                            user.getAddress(),
+                            user.getCity(),
+                            user.getCountry(),
+                            user.getPostalCode(),
+                            user.getGender(),
+                            user.getName(),
+                            user.getSurname()))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(userResponses);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponseDto("No tiene permisos para acceder a la lista de usuarios."));
+        }
+    }
+
+    /**
+     * Checks if the authenticated user has the administrator role (ROLE_ADMIN).
+     *
+     * @param authentication The Authentication object that represents the user's
+     *                       authentication information.
+     * @return true if the user has the administrator role (ROLE_ADMIN), otherwise
+     *         returns false.
+     */
+    private boolean hasRoleAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    /**
+     * Obtains information about a user by their ID.
+     *
+     * This endpoint allows users with administrator or user roles to obtain
+     * detailed information
+     * from a specific user through their ID. If the user making the request does
+     * not have the appropriate permissions
+     * To access this information, a 401 (Unauthorized) status code will be returned
+     * along with an error message.
+     *
+     * @param userId The ID of the user to query.
+     * @return A ResponseEntity object with the user information if found, or an
+     *         error message if not found
+     *         or if the user does not have permissions to access this information.
+     */
+    @GetMapping("/findById/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public ResponseEntity<?> findUserById(@PathVariable Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (hasRoleAdmin(authentication)) {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body(new MessageResponseDto("Usuario no encontrado. Por favor, introduzca un ID válido."));
+            }
+
+            UserListResponseDto response = new UserListResponseDto(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getNumber(),
+                    user.getAddress(),
+                    user.getCity(),
+                    user.getCountry(),
+                    user.getPostalCode(),
+                    user.getGender(),
+                    user.getName(),
+                    user.getSurname());
+
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponseDto("No tiene permisos para acceder a esta información de usuario."));
+        }
+    }
+
+    /**
+     * Gets information about a user by their username.
+     *
+     * This endpoint allows users with administrator or user roles to obtain
+     * detailed information
+     * from a specific user through their username. If the user making the request
+     * does not have the appropriate permissions
+     * To access this information, a 401 (Unauthorized) status code will be returned
+     * along with an error message.
+     *
+     * @param username The username of the user to query.
+     * @return A ResponseEntity object with the user information if found, or an
+     *         error message if not found
+     *         or if the user does not have permissions to access this information.
+     */
+    @GetMapping("/findByUsername/{username}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public ResponseEntity<?> findUserByUsername(@PathVariable String username) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (hasRoleAdmin(authentication)) {
+            Optional<User> userOptional = userRepository.findByUsername(username);
+
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+
+                UserListResponseDto response = new UserListResponseDto(
                         user.getId(),
                         user.getUsername(),
                         user.getEmail(),
@@ -64,93 +189,44 @@ public class UserController {
                         user.getPostalCode(),
                         user.getGender(),
                         user.getName(),
-                        user.getSurname()))
-                .collect(Collectors.toList());
+                        user.getSurname());
 
-        return userResponses;
-    }
-
-    /**
-     * Search for a user by their ID.
-     *
-     * @param userId The ID of the user to search for.
-     * @return A response containing the user information if found,
-     *         or an error message if the user does not exist.
-     */
-    @GetMapping("/findById/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> findUserById(@PathVariable Long userId) {
-
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body(new MessageResponseDto(
+                                "Usuario no encontrado. Por favor, introduzca un nombre de usuario válido."));
+            }
+        } else {
             return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new MessageResponseDto("Usuario no encontrado. Por favor, introduzca un ID válido."));
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponseDto("No tiene permisos para acceder a esta información de usuario."));
         }
-
-        UserListResponseDto response = new UserListResponseDto(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getNumber(),
-                user.getAddress(),
-                user.getCity(),
-                user.getCountry(),
-                user.getPostalCode(),
-                user.getGender(),
-                user.getName(),
-                user.getSurname());
-
-        return ResponseEntity.ok(response);
-    }
-
-    /**
-     * Search for a user by their username.
-     *
-     * @param username The username to search for.
-     * @return A response containing the user information if found,
-     *         or an error message if the user does not exist.
-     */
-    @GetMapping("/findByUsername/{username}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> findUserByUsername(@PathVariable String username) {
-        User user = userRepository.findByUsername(username).orElse(null);
-        if (user == null) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new MessageResponseDto(
-                            "Usuario no encontrado. Por favor, introduzca un nombre de usuario válido."));
-        }
-
-        UserListResponseDto response = new UserListResponseDto(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getNumber(),
-                user.getAddress(),
-                user.getCity(),
-                user.getCountry(),
-                user.getPostalCode(),
-                user.getGender(),
-                user.getName(),
-                user.getSurname());
-
-        return ResponseEntity.ok(response);
     }
 
     /**
      * Create a new user in the system.
      *
+     * This endpoint allows users with administrator or user roles to create a new
+     * user on the system.
+     * If the user making the request does not have the appropriate permissions to
+     * create a new user, it will be returned
+     * a 401 (Unauthorized) status code along with an error message. Additionally,
+     * it will be validated that the username
+     * and email are not in use. If they already exist, a status code 400 (Bad
+     * Request) will be returned.
+     * with a corresponding error message.
+     *
      * @param createUserRequest The details of the user to create.
-     * @param ucBuilder         The URI builder for the new user's location.
-     * @return A response indicating whether the user was created successfully or
-     *         whether an error occurred.
+     * @param ucBuilder         The URI generator for the new user's location.
+     * @return A ResponseEntity object indicating whether the user was created
+     *         successfully or if an error occurred.
      */
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> createUser(@RequestBody CreateUserRequestDto createUserRequest,
             UriComponentsBuilder ucBuilder) {
-
         if (userRepository.existsByUsername(createUserRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
@@ -161,6 +237,12 @@ public class UserController {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponseDto("Error: El correo electrónico ya está en uso!"));
+        }
+
+        if (!hasRoleAdmin(SecurityContextHolder.getContext().getAuthentication())) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponseDto("No tiene permisos para crear un nuevo usuario."));
         }
 
         User user = new User(createUserRequest.getUsername(), createUserRequest.getEmail(),
@@ -198,15 +280,30 @@ public class UserController {
     }
 
     /**
-     * Removes a user from the system by username.
+     * Delete a user by username.
      *
-     * @param username The username of the user to delete.
-     * @return A response indicating whether the user was removed successfully or if
-     *         an error occurred.
+     * This endpoint allows users with administrator or user roles to delete an
+     * existing user on the system
+     * specifying your username. If the user making the request does not have the
+     * appropriate permissions to delete
+     * a user, a 401 (Unauthorized) status code will be returned along with an error
+     * message. If the user with the name
+     * If the specified user is not found in the system, a 400 (Bad Request) status
+     * code will be returned with a
+     * corresponding error message.
+     *
+     * @param username The username of the user to be deleted.
+     * @return A ResponseEntity object indicating whether the user was deleted
+     *         successfully or if an error occurred.
      */
     @DeleteMapping("/deleteByUsername/{username}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> deleteUser(@PathVariable String username) {
+        if (!hasRoleAdmin(SecurityContextHolder.getContext().getAuthentication())) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponseDto("No tiene permisos para eliminar un usuario."));
+        }
 
         User user = userRepository.findByUsername(username).orElse(null);
 
@@ -222,15 +319,30 @@ public class UserController {
     }
 
     /**
-     * Delete a user by their ID.
+     * Deletes a user by their identifier (ID).
+     *
+     * This endpoint allows users with administrator or user roles to delete an
+     * existing user on the system
+     * specifying your ID. If the user making the request does not have the
+     * appropriate permissions to delete a user,
+     * will return a 401 (Unauthorized) status code along with an error message. If
+     * the user with the specified ID is not
+     * is found on the system, a 404 (Not Found) status code will be returned with a
+     * corresponding error message.
      *
      * @param userId The ID of the user to delete.
-     * @return A response indicating whether the deletion was successful or if an
-     *         error occurred.
+     * @return A ResponseEntity object indicating whether the user was deleted
+     *         successfully or if an error occurred.
      */
     @DeleteMapping("/deleteById/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<?> deleteById(@PathVariable Long userId) {
+        if (!hasRoleAdmin(SecurityContextHolder.getContext().getAuthentication())) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponseDto("No tiene permisos para eliminar un usuario."));
+        }
+
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return ResponseEntity
@@ -244,16 +356,33 @@ public class UserController {
     }
 
     /**
-     * Actualiza los detalles de un usuario en el sistema.
+     * Updates the information of an existing user by their identifier (ID).
      *
-     * @param userId            El ID del usuario que se actualizará.
-     * @param updateUserRequest Los datos actualizados del usuario.
-     * @return Una respuesta que indica si la actualización se realizó con éxito o
-     *         si ocurrió un error.
+     * This endpoint allows users with user or administrator roles to update
+     * information for an existing user
+     * specifying your ID and providing the update details in the request body. If
+     * the user who performs
+     * the request does not have the appropriate permissions to update a user, a 401
+     * (Unauthorized) status code will be returned
+     * along with an error message. If the user with the specified ID is not in the
+     * system, a login code will be returned.
+     * status 400 (Bad Request) with a corresponding error message.
+     *
+     * @param userId            The ID of the user to update.
+     * @param updateUserRequest An object containing the update details, such as
+     *                          first name, last name, phone number, address, etc.
+     * @return A ResponseEntity object indicating whether the user was updated
+     *         successfully or if an error occurred.
      */
     @PutMapping("/update/{userId}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateUser(@PathVariable Long userId, @RequestBody UpdateUserRequestDto updateUserRequest) {
+    public ResponseEntity<?> updateUser(@PathVariable Long userId,
+            @RequestBody UpdateUserRequestDto updateUserRequest) {
+        if (!hasRoleAdmin(SecurityContextHolder.getContext().getAuthentication())) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponseDto("No tiene permisos para actualizar un usuario."));
+        }
 
         User user = userRepository.findById(userId).orElse(null);
 

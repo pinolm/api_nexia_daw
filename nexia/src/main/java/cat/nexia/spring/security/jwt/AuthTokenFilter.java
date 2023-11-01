@@ -9,7 +9,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -72,18 +71,19 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   }
 
   /**
-   * Parses a JWT token from the cookies of an HTTP request.
+   * Parses a JWT token from an HTTP request header.
    *
-   * @param request The HTTP request.
-   * @return The JWT token as a string, or null if not found.
+   * @param request The incoming HTTP request from which the JWT token will be
+   *                extracted.
+   * @return The JWT token contained in the "Authorization" header of type
+   *         "Bearer", or null if no valid token is found.
    */
   private String parseJwt(HttpServletRequest request) {
-    // Aquí, en lugar de obtener el token de las cookies, obtén el token del encabezado Authorization
     String authorizationHeader = request.getHeader("Authorization");
     if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-        return authorizationHeader.substring(7);
+      return authorizationHeader.substring(7);
     }
     return null;
-}
+  }
 
 }
