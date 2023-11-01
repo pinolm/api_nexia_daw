@@ -89,12 +89,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/auth/**","/api/reserva/**").permitAll()
                 .anyRequest().authenticated();
 
-
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-
-        // disable page caching
-        http.headers().cacheControl();
-
     }
 
 

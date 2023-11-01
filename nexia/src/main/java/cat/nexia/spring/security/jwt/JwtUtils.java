@@ -55,10 +55,11 @@ public class JwtUtils {
    */
   public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
     String jwt = generateTokenFromUsername(userPrincipal.getUsername());
-    ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(24 * 60 * 60).httpOnly(true)
-        .build();
-    return cookie;
-  }
+    // Aquí puedes establecer el token JWT en lugar de una cookie
+    // Utiliza ResponseEntity para enviar la respuesta con el token JWT al cliente
+    return ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(24 * 60 * 60).httpOnly(true).build();
+}
+
 
   /**
    * Gets an empty JWT cookie, used to delete the JWT cookie.
