@@ -1,16 +1,13 @@
 package cat.nexia.spring.service;
 
-import cat.nexia.spring.dto.response.AllReservasByDiaResponse;
-import cat.nexia.spring.dto.response.AllReservasResponseDto;
-import cat.nexia.spring.dto.response.ReservaDto;
-import cat.nexia.spring.dto.response.UserSimpleDto;
+import cat.nexia.spring.dto.response.*;
 import cat.nexia.spring.models.Reserva;
 import cat.nexia.spring.models.mapper.ReservaMapper;
 import cat.nexia.spring.repository.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,15 +29,16 @@ public class ReservaServiceImpl implements ReservaService {
 
     @Override
     public List<AllReservasResponseDto> findAll() {
-        List<Reserva> reservas = reservaRepository.findAll();
+        List<Reserva> reservas = reservaRepository.findAllByOrderByDiaAsc();
         List<AllReservasResponseDto> allReservasDtos = new ArrayList<>();
 
         for (Reserva reserva : reservas) {
+
             AllReservasResponseDto allReservasDto = new AllReservasResponseDto(
-                    reserva.getIdReserva(),
                     reserva.getDia(),
-                    reserva.getPista(),
-                    reserva.getHorari(),
+                    reserva.getIdReserva(),
+                    new PistaDto(reserva.getPista().getNumPista()),
+                    new HorariDto(reserva.getHorari().getIniHora(), reserva.getHorari().getFiHora()),
                     new UserSimpleDto(reserva.getUser().getId(), reserva.getUser().getUsername()));
 
             allReservasDtos.add(allReservasDto);

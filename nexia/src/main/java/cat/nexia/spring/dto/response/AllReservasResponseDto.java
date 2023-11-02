@@ -1,34 +1,25 @@
 package cat.nexia.spring.dto.response;
 
-import cat.nexia.spring.models.Pista;
-import cat.nexia.spring.models.Horari;
 import java.time.LocalDate;
 
 public class AllReservasResponseDto {
-    
-    private Long idReserva;
+
     private LocalDate dia;
-    private Pista pista;
-    private Horari horari;
+    private Long idReserva;
+
+    private PistaDto pista;
+    private HorariDto horari;
     private UserSimpleDto user;
 
     public AllReservasResponseDto() {
     }
 
-    public AllReservasResponseDto(Long idReserva, LocalDate dia, Pista pista, Horari horari, UserSimpleDto user) {
-        this.idReserva = idReserva;
+    public AllReservasResponseDto(LocalDate dia, Long idReserva,  PistaDto pista, HorariDto horari, UserSimpleDto user) {
         this.dia = dia;
-        this.pista = pista;
-        this.horari = horari;
-        this.user = user;
-    }
-
-    public Long getIdReserva() {
-        return idReserva;
-    }
-
-    public void setIdReserva(Long idReserva) {
         this.idReserva = idReserva;
+        this.horari = horari;
+        this.pista = pista;
+        this.user = user;
     }
 
     public LocalDate getDia() {
@@ -39,20 +30,28 @@ public class AllReservasResponseDto {
         this.dia = dia;
     }
 
-    public Pista getPista() {
+    public PistaDto getPista() {
         return pista;
     }
 
-    public void setPista(Pista pista) {
+    public void setPista(PistaDto pista) {
         this.pista = pista;
     }
 
-    public Horari getHorari() {
+    public HorariDto getHorari() {
         return horari;
     }
 
-    public void setHorari(Horari horari) {
+    public void setHorari(HorariDto horari) {
         this.horari = horari;
+    }
+
+    public Long getIdReserva() {
+        return idReserva;
+    }
+
+    public void setIdReserva(Long idReserva) {
+        this.idReserva = idReserva;
     }
 
     public UserSimpleDto getUser() {

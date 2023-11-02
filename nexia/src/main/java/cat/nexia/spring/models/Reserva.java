@@ -1,9 +1,9 @@
 package cat.nexia.spring.models;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
-import javax.persistence.*;
 
 @Entity
 @Table(name = "reserva" /*, uniqueConstraints={@UniqueConstraint(columnNames={"id_pista","id_horari","dia"})}*/)

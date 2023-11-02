@@ -18,6 +18,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     List<Reserva> findAll ();
 
+    List<Reserva> findAllByOrderByDiaAsc();
+
     Reserva findReservaByIdReserva(Long idReserva);
 
      Reserva findReservaByIdPistaAndIdHorariAndDia(Long idPista, Long idHorari, LocalDate dia);
