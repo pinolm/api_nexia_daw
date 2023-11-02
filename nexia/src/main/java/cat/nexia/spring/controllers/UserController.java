@@ -102,53 +102,37 @@ public class UserController {
     }
 
     /**
-     * Obtains information about a user by their ID.
+     * Obtain the details of a user for your ID.
      *
-     * This endpoint allows users with administrator or user roles to obtain
-     * detailed information
-     * from a specific user through their ID. If the user making the request does
-     * not have the appropriate permissions
-     * To access this information, a 401 (Unauthorized) status code will be returned
-     * along with an error message.
-     *
-     * @param userId The ID of the user to query.
-     * @return A ResponseEntity object with the user information if found, or an
-     *         error message if not found
-     *         or if the user does not have permissions to access this information.
+     * @param userId The ID of the user that is nearby.
+     * @return ResponseEntity with user details if it is troba or a missatge
+     *         d'error if it is not troba.
      */
     @GetMapping("/findById/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public ResponseEntity<?> findUserById(@PathVariable Long userId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (hasRoleAdmin(authentication)) {
-            User user = userRepository.findById(userId).orElse(null);
-            if (user == null) {
-                return ResponseEntity
-                        .status(HttpStatus.NOT_FOUND)
-                        .body(new MessageResponseDto("Usuario no encontrado. Por favor, introduzca un ID válido."));
-            }
-
-            UserListResponseDto response = new UserListResponseDto(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getEmail(),
-                    user.getNumber(),
-                    user.getAddress(),
-                    user.getCity(),
-                    user.getCountry(),
-                    user.getPostalCode(),
-                    user.getGender(),
-                    user.getName(),
-                    user.getSurname());
-
-            return ResponseEntity.ok(response);
-        } else {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
             return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponseDto("No tiene permisos para acceder a esta información de usuario."));
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponseDto("Usuario no encontrado. Por favor, introduzca un ID válido."));
         }
+
+        UserListResponseDto response = new UserListResponseDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getNumber(),
+                user.getAddress(),
+                user.getCity(),
+                user.getCountry(),
+                user.getPostalCode(),
+                user.getGender(),
+                user.getName(),
+                user.getSurname());
+
+        return ResponseEntity.ok(response);
     }
 
     /**
