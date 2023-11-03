@@ -1,8 +1,10 @@
 package cat.nexia.spring.service;
 
-import cat.nexia.spring.dto.response.*;
+import cat.nexia.spring.dto.response.AllReservasResponseDto;
+import cat.nexia.spring.dto.response.HorariDto;
+import cat.nexia.spring.dto.response.PistaDto;
+import cat.nexia.spring.dto.response.UserSimpleDto;
 import cat.nexia.spring.models.Reserva;
-import cat.nexia.spring.models.mapper.ReservaMapper;
 import cat.nexia.spring.repository.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,9 +21,9 @@ public class ReservaServiceImpl implements ReservaService {
     private ReservaRepository reservaRepository;
 
     @Override
-    public List<Reserva> findReservaByDia(LocalDate dia) {
+    public List<AllReservasResponseDto> findReservaByDia(LocalDate dia) {
         if (dia != null) {
-            return reservaRepository.findReservaByDia(dia);
+            return getAllReservasResponseDtos(reservaRepository.findReservaByDia(dia));
         } else {
             return Collections.emptyList();
         }
@@ -30,6 +32,33 @@ public class ReservaServiceImpl implements ReservaService {
     @Override
     public List<AllReservasResponseDto> findAll() {
         List<Reserva> reservas = reservaRepository.findAllByOrderByDiaAsc();
+        return getAllReservasResponseDtos(reservas);
+    }
+
+
+    @Override
+    public Reserva findReservaById(Long idReserva) {
+        return reservaRepository.findReservaByIdReserva(idReserva);
+    }
+    @Override
+    public void guardarReserva(Reserva reserva) {
+        reservaRepository.insertarReserva(reserva.getIdPista(), reserva.getIdHorari(), reserva.getIdUsuari(),
+                reserva.getDia());
+    }
+
+
+    @Override
+    public Reserva findReservaByIdPistaAndIdHorariAndDia(Reserva reserva) {
+        return reservaRepository.findReservaByIdPistaAndIdHorariAndDia(reserva.getIdPista(), reserva.getIdHorari(),
+                reserva.getDia());
+    }
+
+    @Override
+    public void eliminarReservaById(Long idReserva) {
+        reservaRepository.deleteReservaByIdReserva(idReserva);
+    }
+
+    private List<AllReservasResponseDto> getAllReservasResponseDtos(List<Reserva> reservas) {
         List<AllReservasResponseDto> allReservasDtos = new ArrayList<>();
 
         for (Reserva reserva : reservas) {
@@ -43,34 +72,7 @@ public class ReservaServiceImpl implements ReservaService {
 
             allReservasDtos.add(allReservasDto);
         }
-
         return allReservasDtos;
-    }
-
-    @Override
-    public ReservaDto findReservaById(Long idReserva) {
-        Reserva reserva = reservaRepository.findReservaByIdReserva(idReserva);
-        if (reserva != null) {
-            return ReservaMapper.toReservaDto(reserva);
-        }
-        return null;
-    }
-
-    @Override
-    public void guardarReserva(Reserva reserva) {
-        reservaRepository.insertarReserva(reserva.getIdPista(), reserva.getIdHorari(), reserva.getIdUsuari(),
-                reserva.getDia());
-    }
-
-    @Override
-    public Reserva findReservaByIdPistaAndIdHorariAndDia(Reserva reserva) {
-        return reservaRepository.findReservaByIdPistaAndIdHorariAndDia(reserva.getIdPista(), reserva.getIdHorari(),
-                reserva.getDia());
-    }
-
-    @Override
-    public void eliminarReservaById(Long idReserva) {
-        reservaRepository.deleteReservaByIdReserva(idReserva);
     }
 
 

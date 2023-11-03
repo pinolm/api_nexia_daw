@@ -1,12 +1,13 @@
 package cat.nexia.spring.controllers;
 
-import cat.nexia.spring.dto.response.AllReservasByDiaResponse;
 import cat.nexia.spring.dto.response.AllReservasResponseDto;
 import cat.nexia.spring.dto.response.MessageResponseDto;
 import cat.nexia.spring.dto.response.ReservaDto;
 import cat.nexia.spring.mail.SendMail;
 import cat.nexia.spring.mail.StringMails;
 import cat.nexia.spring.models.Reserva;
+import cat.nexia.spring.models.mapper.AllReservaMapper;
+import cat.nexia.spring.models.mapper.ReservaMapper;
 import cat.nexia.spring.service.ReservaService;
 import cat.nexia.spring.utils.NexiaEnum;
 import cat.nexia.spring.utils.NexiaUtils;
@@ -17,16 +18,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api/reserva")
 public class ReservaController {
 
+    public static final String EMAIL = "correuvostre@hotmail.com";
     @Autowired
     private ReservaService reservaService;
 
@@ -38,7 +38,7 @@ public class ReservaController {
     /**
      * Retrieves and returns a list of reservations for the specified date.
      *
-     * @param day The date in "yyyy-MM-dd" format for which reservations will be
+     * @param dia The date in "yyyy-MM-dd" format for which reservations will be
      *            retrieved.
      * @return ResponseEntity with the list of reservations in
      *         AllReservasByDiaResponse format if reservations are found, or an
@@ -54,19 +54,10 @@ public class ReservaController {
                     "El patró correcte de la data és: \"yyyy-MM-dd\"", HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
             LocalDate localDate = LocalDate.parse(dia, formatter);
-            List<Reserva> reservaList = reservaService.findReservaByDia(localDate);
+            List<AllReservasResponseDto> reservaList = reservaService.findReservaByDia(localDate);
             if (reservaList != null && !reservaList.isEmpty()) {
-                // Mapeja las reservas al DTO AllReservasByDiaResponse
-                List<AllReservasByDiaResponse> responseList = reservaList.stream()
-                        .map(reserva -> new AllReservasByDiaResponse(
-                                reserva.getUser().getId(),
-                                reserva.getIdReserva(),
-                                reserva.getHorari().getIdHorari(),
-                                LocalTime.parse(reserva.getHorari().getIniHora()),
-                                reserva.getUser().getUsername()))
-                        .collect(Collectors.toList());
 
-                return new ResponseEntity<>(responseList, HttpStatus.OK);
+                return new ResponseEntity<>(reservaList, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("No existeixen reserves per al dia: " + dia, HttpStatus.OK);
             }
@@ -112,11 +103,12 @@ public class ReservaController {
             Reserva guardada = reservaService.findReservaByIdPistaAndIdHorariAndDia(reserva);
             if (reserva != null) {
                 // SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ
-                sendMail.sendEmailHtml("correuvostre@hotmail.com", null, null, "TEST", StringMails.mailPedido);
-                return new ResponseEntity<>(guardada, HttpStatus.OK);
+                sendMail.sendEmailHtml(EMAIL, null, null, "TEST", StringMails.mailPedido);
+                ReservaDto reservaDto = ReservaMapper.toReservaDto(guardada);
+                return new ResponseEntity<>(reservaDto, HttpStatus.OK);
             } else {
                 // SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ
-                sendMail.sendEmailHtml("correuvostre@hotmail.com", null, null, "TEST", StringMails.mailPedido);
+                sendMail.sendEmailHtml(EMAIL, null, null, "TEST", StringMails.mailPedido);
                 return new ResponseEntity<>(reserva, HttpStatus.OK);
             }
 
@@ -140,7 +132,9 @@ public class ReservaController {
     @GetMapping("/reservaById/{idReserva}")
     public ResponseEntity<Object> reservaById(@PathVariable("idReserva") Long idReserva) {
         try {
-            return new ResponseEntity<>(reservaService.findReservaById(idReserva), HttpStatus.OK);
+            AllReservasResponseDto reservasResponseDto = AllReservaMapper.
+                    toReservaDto(reservaService.findReservaById(idReserva));
+            return new ResponseEntity<>(reservasResponseDto, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -149,12 +143,13 @@ public class ReservaController {
     @DeleteMapping("/deleteReserva/{idReserva}")
     public ResponseEntity<Object> deleteReservaById(@PathVariable("idReserva") Long idReserva) {
         try {
-            ReservaDto reservaDto = reservaService.findReservaById(idReserva);
+            Reserva reserva = reservaService.findReservaById(idReserva);
+            ReservaDto reservaDto = ReservaMapper.toReservaDto(reserva);
             if (reservaDto != null) {
                 reservaDto.setInfo(NexiaEnum.RESERVA_DELETE_INFO.getPhrase());
                 reservaService.eliminarReservaById(idReserva);
                 // SI ELIMINA, ENVIAR EMAIL AMB CONFIRMACIÓ
-                sendMail.sendEmailHtml("correuvostre@hotmail.com", null, null, "TEST", StringMails.mailPedido);
+                sendMail.sendEmailHtml(EMAIL, null, null, "TEST", StringMails.mailPedido);
                 return new ResponseEntity<>(reservaDto, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(new MessageResponseDto(NexiaEnum.ID_ERROR.getPhrase() + idReserva),

@@ -9,7 +9,7 @@ public class HorariMapper {
 
     private static final Log LOG = LogFactory.getLog(HorariMapper.class);
 
-    public static HorariDto toReservaDto(Horari reserva) {
+    public static HorariDto toHorariDto(Horari reserva) {
 
         if (reserva == null){
             return null;

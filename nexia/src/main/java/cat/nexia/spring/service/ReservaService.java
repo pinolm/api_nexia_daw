@@ -1,7 +1,6 @@
 package cat.nexia.spring.service;
 
 import cat.nexia.spring.dto.response.AllReservasResponseDto;
-import cat.nexia.spring.dto.response.ReservaDto;
 import cat.nexia.spring.models.Reserva;
 
 import java.time.LocalDate;
@@ -9,11 +8,11 @@ import java.util.List;
 
 public interface ReservaService {
 
-    List<Reserva> findReservaByDia (LocalDate dia);
+    List<AllReservasResponseDto> findReservaByDia (LocalDate dia);
 
    List<AllReservasResponseDto> findAll();
 
-    ReservaDto findReservaById (Long idReserva);
+    Reserva findReservaById (Long idReserva);
 
     void guardarReserva (Reserva reserva);
 
