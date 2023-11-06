@@ -58,7 +58,7 @@ public class UserController {
      *         error message in case of missing permissions.
      */
     @GetMapping("/list")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public ResponseEntity<?> userList() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -109,7 +109,7 @@ public class UserController {
      *         d'error if it is not troba.
      */
     @GetMapping("/findById/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public ResponseEntity<?> findUserById(@PathVariable Long userId) {
         User user = userRepository.findById(userId).orElse(null);
@@ -151,42 +151,36 @@ public class UserController {
      *         or if the user does not have permissions to access this information.
      */
     @GetMapping("/findByUsername/{username}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public ResponseEntity<?> findUserByUsername(@PathVariable String username) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (hasRoleAdmin(authentication)) {
-            Optional<User> userOptional = userRepository.findByUsername(username);
+        Optional<User> userOptional = userRepository.findByUsername(username);
 
-            if (userOptional.isPresent()) {
-                User user = userOptional.get();
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
 
-                UserListResponseDto response = new UserListResponseDto(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getEmail(),
-                        user.getNumber(),
-                        user.getAddress(),
-                        user.getCity(),
-                        user.getCountry(),
-                        user.getPostalCode(),
-                        user.getGender(),
-                        user.getName(),
-                        user.getSurname());
+            UserListResponseDto response = new UserListResponseDto(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getNumber(),
+                    user.getAddress(),
+                    user.getCity(),
+                    user.getCountry(),
+                    user.getPostalCode(),
+                    user.getGender(),
+                    user.getName(),
+                    user.getSurname());
 
-                return ResponseEntity.ok(response);
-            } else {
-                return ResponseEntity
-                        .status(HttpStatus.NOT_FOUND)
-                        .body(new MessageResponseDto(
-                                "Usuario no encontrado. Por favor, introduzca un nombre de usuario válido."));
-            }
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponseDto("No tiene permisos para acceder a esta información de usuario."));
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponseDto(
+                            "Usuario no encontrado. Por favor, introduzca un nombre de usuario válido."));
         }
+
     }
 
     /**
@@ -208,7 +202,7 @@ public class UserController {
      *         successfully or if an error occurred.
      */
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<?> createUser(@RequestBody CreateUserRequestDto createUserRequest,
             UriComponentsBuilder ucBuilder) {
         if (userRepository.existsByUsername(createUserRequest.getUsername())) {
@@ -221,12 +215,6 @@ public class UserController {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponseDto("Error: El correo electrónico ya está en uso!"));
-        }
-
-        if (!hasRoleAdmin(SecurityContextHolder.getContext().getAuthentication())) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponseDto("No tiene permisos para crear un nuevo usuario."));
         }
 
         User user = new User(createUserRequest.getUsername(), createUserRequest.getEmail(),
@@ -281,13 +269,8 @@ public class UserController {
      *         successfully or if an error occurred.
      */
     @DeleteMapping("/deleteByUsername/{username}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<?> deleteUser(@PathVariable String username) {
-        if (!hasRoleAdmin(SecurityContextHolder.getContext().getAuthentication())) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponseDto("No tiene permisos para eliminar un usuario."));
-        }
 
         User user = userRepository.findByUsername(username).orElse(null);
 
@@ -319,13 +302,8 @@ public class UserController {
      *         successfully or if an error occurred.
      */
     @DeleteMapping("/deleteById/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<?> deleteById(@PathVariable Long userId) {
-        if (!hasRoleAdmin(SecurityContextHolder.getContext().getAuthentication())) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponseDto("No tiene permisos para eliminar un usuario."));
-        }
 
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
@@ -359,14 +337,9 @@ public class UserController {
      *         successfully or if an error occurred.
      */
     @PutMapping("/update/{userId}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<?> updateUser(@PathVariable Long userId,
             @RequestBody UpdateUserRequestDto updateUserRequest) {
-        if (!hasRoleAdmin(SecurityContextHolder.getContext().getAuthentication())) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponseDto("No tiene permisos para actualizar un usuario."));
-        }
 
         User user = userRepository.findById(userId).orElse(null);
 
