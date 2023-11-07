@@ -63,3 +63,10 @@ Pots trobar la documentació de l'API i exemples de les rutes i recursos a API.m
 ## Contacte
 
 Correu electrònic: nexia.padel@gmail.com 
+
+## Membres del grup:
+
+    Josep Faneca
+    Laura Fernàndez
+    Laura Gil
+    Cristian Piñol
