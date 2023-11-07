@@ -6,15 +6,18 @@ import cat.nexia.spring.dto.response.ReservaDto;
 import cat.nexia.spring.mail.SendMail;
 import cat.nexia.spring.mail.StringMails;
 import cat.nexia.spring.models.Reserva;
+import cat.nexia.spring.models.User;
 import cat.nexia.spring.models.mapper.AllReservaMapper;
 import cat.nexia.spring.models.mapper.ReservaMapper;
 import cat.nexia.spring.service.ReservaService;
+import cat.nexia.spring.service.UserService;
 import cat.nexia.spring.utils.NexiaEnum;
 import cat.nexia.spring.utils.NexiaUtils;
 import org.apache.commons.validator.GenericValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -26,12 +29,15 @@ import java.util.List;
 @RequestMapping("/api/reserva")
 public class ReservaController {
 
-    public static final String EMAIL = "correuvostre@hotmail.com";
+    public static final String EMAIL = "josep.faneca@outlook.es";
     @Autowired
     private ReservaService reservaService;
 
     @Autowired
     private SendMail sendMail;
+
+    @Autowired
+    private UserService userService;
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern(NexiaEnum.DATA_TIME_FORMAT.getPhrase());
 
@@ -102,8 +108,9 @@ public class ReservaController {
             reservaService.guardarReserva(reserva);
             Reserva guardada = reservaService.findReservaByIdPistaAndIdHorariAndDia(reserva);
             if (reserva != null) {
-                // SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ
-                sendMail.sendEmailHtml(EMAIL, null, null, "TEST", StringMails.mailPedido);
+                //SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ
+                String cosEmail = StringMails.cosEmailReserva(guardada);
+                sendMail.sendEmailHtml(guardada.getUser().getEmail(), null, null, "Nexia Pàdel: RESERVA", cosEmail);
                 ReservaDto reservaDto = ReservaMapper.toReservaDto(guardada);
                 return new ResponseEntity<>(reservaDto, HttpStatus.OK);
             } else {
@@ -114,7 +121,6 @@ public class ReservaController {
 
         } catch (Exception e) {
             if (NexiaUtils.psqlException(e) != null) {
-
                 return new ResponseEntity<>(new MessageResponseDto(NexiaUtils.psqlException(e)),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
