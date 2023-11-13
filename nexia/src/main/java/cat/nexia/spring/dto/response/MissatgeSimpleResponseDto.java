@@ -1,9 +1,10 @@
 package cat.nexia.spring.dto.response;
 
-public class MessageResponseDto {
+public class MissatgeSimpleResponseDto {
+
 	private String message;
 
-	public MessageResponseDto(String message) {
+	public MissatgeSimpleResponseDto(String message) {
 	    this.message = message;
 	  }
 

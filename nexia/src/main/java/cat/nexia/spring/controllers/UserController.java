@@ -2,7 +2,7 @@ package cat.nexia.spring.controllers;
 
 import cat.nexia.spring.dto.request.CreateUserRequestDto;
 import cat.nexia.spring.dto.request.UpdateUserRequestDto;
-import cat.nexia.spring.dto.response.MessageResponseDto;
+import cat.nexia.spring.dto.response.MissatgeSimpleResponseDto;
 import cat.nexia.spring.dto.response.UserListResponseDto;
 import cat.nexia.spring.models.ERole;
 import cat.nexia.spring.models.Role;
@@ -84,7 +84,7 @@ public class UserController {
             return ResponseEntity.ok(userResponses);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponseDto("No tiene permisos para acceder a la lista de usuarios."));
+                    .body(new MissatgeSimpleResponseDto("No tiene permisos para acceder a la lista de usuarios."));
         }
     }
 
@@ -116,7 +116,7 @@ public class UserController {
         if (user == null) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body(new MessageResponseDto("Usuario no encontrado. Por favor, introduzca un ID válido."));
+                    .body(new MissatgeSimpleResponseDto("Usuario no encontrado. Por favor, introduzca un ID válido."));
         }
 
         UserListResponseDto response = new UserListResponseDto(
@@ -177,7 +177,7 @@ public class UserController {
         } else {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body(new MessageResponseDto(
+                    .body(new MissatgeSimpleResponseDto(
                             "Usuario no encontrado. Por favor, introduzca un nombre de usuario válido."));
         }
 
@@ -208,13 +208,13 @@ public class UserController {
         if (userRepository.existsByUsername(createUserRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponseDto("Error: El nombre de usuario ya está en uso!"));
+                    .body(new MissatgeSimpleResponseDto("Error: El nombre de usuario ya está en uso!"));
         }
 
         if (userRepository.existsByEmail(createUserRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponseDto("Error: El correo electrónico ya está en uso!"));
+                    .body(new MissatgeSimpleResponseDto("Error: El correo electrónico ya está en uso!"));
         }
 
         User user = new User(createUserRequest.getUsername(), createUserRequest.getEmail(),
@@ -248,7 +248,7 @@ public class UserController {
         userRepository.save(user);
 
         return ResponseEntity.created(ucBuilder.path("/api/users/{id}").buildAndExpand(user.getId()).toUri())
-                .body(new MessageResponseDto("Usuario creado exitosamente!"));
+                .body(new MissatgeSimpleResponseDto("Usuario creado exitosamente!"));
     }
 
     /**
@@ -277,12 +277,12 @@ public class UserController {
         if (user == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponseDto("Error: Usuario no encontrado."));
+                    .body(new MissatgeSimpleResponseDto("Error: Usuario no encontrado."));
         }
 
         userRepository.delete(user);
 
-        return ResponseEntity.ok(new MessageResponseDto("Usuario eliminado exitosamente."));
+        return ResponseEntity.ok(new MissatgeSimpleResponseDto("Usuario eliminado exitosamente."));
     }
 
     /**
@@ -309,12 +309,12 @@ public class UserController {
         if (user == null) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body(new MessageResponseDto("Usuario no encontrado. Por favor, introduzca un ID válido."));
+                    .body(new MissatgeSimpleResponseDto("Usuario no encontrado. Por favor, introduzca un ID válido."));
         }
 
         userRepository.delete(user);
 
-        return ResponseEntity.ok(new MessageResponseDto("Usuario eliminado exitosamente."));
+        return ResponseEntity.ok(new MissatgeSimpleResponseDto("Usuario eliminado exitosamente."));
     }
 
     /**
@@ -346,7 +346,7 @@ public class UserController {
         if (user == null) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponseDto("Error: El usuario no existe."));
+                    .body(new MissatgeSimpleResponseDto("Error: El usuario no existe."));
         }
 
         if (updateUserRequest.getName() != null) {
@@ -389,7 +389,7 @@ public class UserController {
 
         userRepository.save(user);
 
-        return ResponseEntity.ok(new MessageResponseDto("Usuario actualizado exitosamente."));
+        return ResponseEntity.ok(new MissatgeSimpleResponseDto("Usuario actualizado exitosamente."));
     }
 
 }
