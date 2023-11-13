@@ -73,8 +73,7 @@ public class MissatgeController {
      *
      * This endpoint allows users to get details of a specific message
      * identified by your ID. If the message exists, a successful response is
-     * returned with
-     * message details. If the message is not found, a response is returned
+     * returned with message details. If the message is not found, a response is returned
      * 404 (Not Found) with an error message.
      *
      * @param id The ID of the message to retrieve.
