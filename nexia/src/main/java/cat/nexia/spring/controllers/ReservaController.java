@@ -114,9 +114,7 @@ public class ReservaController {
                 ReservaDto reservaDto = ReservaMapper.toReservaDto(guardada);
                 return new ResponseEntity<>(reservaDto, HttpStatus.OK);
             } else {
-                // SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ
-                sendMail.sendEmailHtml(EMAIL, null, null, "TEST", StringMails.mailPedido);
-                return new ResponseEntity<>(reserva, HttpStatus.OK);
+                return new ResponseEntity<>(reserva, HttpStatus.NO_CONTENT);
             }
 
         } catch (Exception e) {
