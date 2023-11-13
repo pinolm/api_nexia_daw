@@ -9,7 +9,6 @@ import cat.nexia.spring.models.Reserva;
 import cat.nexia.spring.models.mapper.AllReservaMapper;
 import cat.nexia.spring.models.mapper.ReservaMapper;
 import cat.nexia.spring.service.ReservaService;
-import cat.nexia.spring.service.UserService;
 import cat.nexia.spring.utils.NexiaEnum;
 import cat.nexia.spring.utils.NexiaUtils;
 import org.apache.commons.validator.GenericValidator;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
