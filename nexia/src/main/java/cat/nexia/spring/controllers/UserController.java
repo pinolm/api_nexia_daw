@@ -349,6 +349,10 @@ public class UserController {
                     .body(new MissatgeSimpleResponseDto("Error: El usuario no existe."));
         }
 
+        if (updateUserRequest.getEmail() != null) {
+            user.setEmail(updateUserRequest.getEmail());
+        }
+
         if (updateUserRequest.getName() != null) {
             user.setName(updateUserRequest.getName());
         }
@@ -382,7 +386,6 @@ public class UserController {
         }
 
         if (updateUserRequest.getPassword() != null) {
-            // Encriptar la nueva contraseña y guardarla
             String encryptedPassword = passwordEncoder.encode(updateUserRequest.getPassword());
             user.setPassword(encryptedPassword);
         }
