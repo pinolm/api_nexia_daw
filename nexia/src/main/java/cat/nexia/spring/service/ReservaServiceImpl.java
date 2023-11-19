@@ -64,6 +64,10 @@ public class ReservaServiceImpl implements ReservaService {
         reservaRepository.deleteReservaByIdReserva(idReserva);
     }
 
+    @Override
+    public int countReservaByDiaAndByUser(Reserva reserva) {
+        return reservaRepository.countReservaByUserAndDia(reserva.getIdUsuari(), reserva.getDia());
+    }
 
 
     private List<AllReservasResponseDto> getAllReservasResponseDtos(List<Reserva> reservas) {
