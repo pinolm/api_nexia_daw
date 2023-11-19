@@ -22,5 +22,7 @@ public interface ReservaService {
 
     void eliminarReservaById (Long idReserva);
 
+    int countReservaByDiaAndByUser (Reserva reserva);
+
 
 }

@@ -97,12 +97,19 @@ public class ReservaController {
      */
     @PostMapping("/createReserva")
     public ResponseEntity<Object> createReserva(@RequestBody Reserva reserva) {
+        //comprobar si l'usuari té més d'una reserva per dia, si és així, no pot realitzar la reserva
+        int numReserves = reservaService.countReservaByDiaAndByUser(reserva);
+        if(numReserves>0){
+            return new ResponseEntity<>("Límit de reserves per dia superat." +
+                    "Sols pot realitzar una reserva per dia", HttpStatus.OK);
+        }
+
         try {
             reservaService.guardarReserva(reserva);
             Reserva guardada = reservaService.findReservaByIdPistaAndIdHorariAndDia(reserva);
             if (reserva != null) {
-                //SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ
-                String cosEmail = StringMails.cosEmailReserva(guardada);
+                //SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ. Cos de l'email millorat per Laura GC
+                String cosEmail = StringMails.cosEmailReservaMillorat(guardada);
                 sendMail.sendEmailHtml(guardada.getUser().getEmail(), null, null, "Nexia Pàdel: RESERVA", cosEmail);
                 ReservaDto reservaDto = ReservaMapper.toReservaDto(guardada);
                 return new ResponseEntity<>(reservaDto, HttpStatus.OK);

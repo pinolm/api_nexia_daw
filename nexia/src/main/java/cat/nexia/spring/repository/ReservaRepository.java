@@ -37,5 +37,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     @Transactional(propagation = Propagation.REQUIRED)
     void deleteReservaByIdReserva(Long idReserva);
 
+    @Query(value = "select count(*) from nexia.reserva where id_usuari=? and dia=?", nativeQuery = true)
+    int countReservaByUserAndDia(Long idUsuari, LocalDate dia);
+
 
 }
