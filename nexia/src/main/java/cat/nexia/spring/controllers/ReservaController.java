@@ -1,25 +1,21 @@
 package cat.nexia.spring.controllers;
 
 import cat.nexia.spring.dto.response.AllReservasResponseDto;
-import cat.nexia.spring.dto.response.MessageResponseDto;
+import cat.nexia.spring.dto.response.MissatgeSimpleResponseDto;
 import cat.nexia.spring.dto.response.ReservaDto;
 import cat.nexia.spring.mail.SendMail;
 import cat.nexia.spring.mail.StringMails;
 import cat.nexia.spring.models.Reserva;
-import cat.nexia.spring.models.User;
 import cat.nexia.spring.models.mapper.AllReservaMapper;
 import cat.nexia.spring.models.mapper.ReservaMapper;
 import cat.nexia.spring.service.ReservaService;
-import cat.nexia.spring.service.UserService;
 import cat.nexia.spring.utils.NexiaEnum;
 import cat.nexia.spring.utils.NexiaUtils;
 import org.apache.commons.validator.GenericValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -35,9 +31,6 @@ public class ReservaController {
 
     @Autowired
     private SendMail sendMail;
-
-    @Autowired
-    private UserService userService;
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern(NexiaEnum.DATA_TIME_FORMAT.getPhrase());
 
@@ -119,10 +112,10 @@ public class ReservaController {
 
         } catch (Exception e) {
             if (NexiaUtils.psqlException(e) != null) {
-                return new ResponseEntity<>(new MessageResponseDto(NexiaUtils.psqlException(e)),
+                return new ResponseEntity<>(new MissatgeSimpleResponseDto(NexiaUtils.psqlException(e)),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            return new ResponseEntity<>(new MessageResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new MissatgeSimpleResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -169,7 +162,7 @@ public class ReservaController {
                 sendMail.sendEmailHtml(EMAIL, null, null, "TEST", StringMails.mailPedido);
                 return new ResponseEntity<>(reservaDto, HttpStatus.OK);
             } else {
-                return new ResponseEntity<>(new MessageResponseDto(NexiaEnum.ID_ERROR.getPhrase() + idReserva),
+                return new ResponseEntity<>(new MissatgeSimpleResponseDto(NexiaEnum.ID_ERROR.getPhrase() + idReserva),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } catch (Exception e) {

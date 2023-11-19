@@ -2,7 +2,7 @@ package cat.nexia.spring.controllers;
 
 import cat.nexia.spring.dto.request.LoginRequestDto;
 import cat.nexia.spring.dto.request.RegisterRequestDto;
-import cat.nexia.spring.dto.response.MessageResponseDto;
+import cat.nexia.spring.dto.response.MissatgeSimpleResponseDto;
 import cat.nexia.spring.dto.response.UserInfoResponseDto;
 import cat.nexia.spring.models.ERole;
 import cat.nexia.spring.models.Role;
@@ -96,11 +96,11 @@ public class AuthController {
   @PostMapping("/register")
   public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequestDto signUpRequest) {
     if (userRepository.existsByUsername(signUpRequest.getUsername().toLowerCase())) {
-      return ResponseEntity.badRequest().body(new MessageResponseDto("Error: Username is already taken!"));
+      return ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto("Error: Username is already taken!"));
     }
 
     if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-      return ResponseEntity.badRequest().body(new MessageResponseDto("Error: Email is already in use!"));
+      return ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto("Error: Email is already in use!"));
     }
 
     // Create new user's account
@@ -141,7 +141,7 @@ public class AuthController {
     user.setRoles(roles);
     userRepository.save(user);
 
-    return ResponseEntity.ok(new MessageResponseDto("The user has been created successfully."));
+    return ResponseEntity.ok(new MissatgeSimpleResponseDto("The user has been created successfully."));
   }
 
   /**
@@ -153,6 +153,6 @@ public class AuthController {
   public ResponseEntity<?> logoutUser() {
     ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
     return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
-        .body(new MessageResponseDto("the user has successfully logged out"));
+        .body(new MissatgeSimpleResponseDto("the user has successfully logged out"));
   }
 }
