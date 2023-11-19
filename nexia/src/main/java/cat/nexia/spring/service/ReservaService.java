@@ -14,9 +14,13 @@ public interface ReservaService {
 
     Reserva findReservaById (Long idReserva);
 
+    List<AllReservasResponseDto> findReservaByUserId (Long idUser);
+
     void guardarReserva (Reserva reserva);
 
     Reserva findReservaByIdPistaAndIdHorariAndDia (Reserva reserva);
 
     void eliminarReservaById (Long idReserva);
+
+
 }

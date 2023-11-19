@@ -143,6 +143,19 @@ public class ReservaController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/reservaByUser/{idUsuari}")
+    public ResponseEntity<Object> reservaByUserId(@PathVariable("idUsuari") Long idUser) {
+        try {
+            List<AllReservasResponseDto> reservas = reservaService.findReservaByUserId(idUser);
+            if (reservas.isEmpty()){
+                return new ResponseEntity<>("L'usuari: ".concat(idUser.toString()).concat(" no té reserves"), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(reservas, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @DeleteMapping("/deleteReserva/{idReserva}")
     public ResponseEntity<Object> deleteReservaById(@PathVariable("idReserva") Long idReserva) {

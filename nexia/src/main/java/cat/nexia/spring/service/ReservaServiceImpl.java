@@ -40,6 +40,12 @@ public class ReservaServiceImpl implements ReservaService {
     public Reserva findReservaById(Long idReserva) {
         return reservaRepository.findReservaByIdReserva(idReserva);
     }
+
+    @Override
+    public List<AllReservasResponseDto> findReservaByUserId(Long idUser) {
+        return  getAllReservasResponseDtos(reservaRepository.findReservaByIdUsuari(idUser));
+    }
+
     @Override
     public void guardarReserva(Reserva reserva) {
         reservaRepository.insertarReserva(reserva.getIdPista(), reserva.getIdHorari(), reserva.getIdUsuari(),
@@ -57,6 +63,8 @@ public class ReservaServiceImpl implements ReservaService {
     public void eliminarReservaById(Long idReserva) {
         reservaRepository.deleteReservaByIdReserva(idReserva);
     }
+
+
 
     private List<AllReservasResponseDto> getAllReservasResponseDtos(List<Reserva> reservas) {
         List<AllReservasResponseDto> allReservasDtos = new ArrayList<>();
