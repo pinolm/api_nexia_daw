@@ -1,7 +1,6 @@
 package cat.nexia.spring.service;
 
 import java.util.List;
-
 import cat.nexia.spring.models.Respuesta;
 
 public interface RespuestaService {
