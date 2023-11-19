@@ -7,13 +7,16 @@ public class MissatgeDetailResponseDto {
     private Long messageId;
     private Long userId;
     private String username;
+    private String titulo;
     private String content;
     private Date createdAt;
+    
 
-    public MissatgeDetailResponseDto(Long messageId, Long userId, String username, String content, Date createdAt) {
+    public MissatgeDetailResponseDto(Long messageId, Long userId, String username, String titulo, String content, Date createdAt) {
         this.messageId = messageId;
         this.userId = userId;
         this.username = username;
+        this.titulo = titulo;
         this.content = content;
         this.createdAt = createdAt;
     }
@@ -28,6 +31,14 @@ public class MissatgeDetailResponseDto {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
 
     public String getContent() {

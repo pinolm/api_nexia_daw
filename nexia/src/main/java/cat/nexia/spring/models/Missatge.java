@@ -20,6 +20,9 @@ public class Missatge implements Serializable{
     @JoinColumn(name = "id_usuari", nullable = false)
     private User user;
 
+    @Column(name = "titol_missatge")
+    private String titulo;
+
     @Column(name = "missatge",nullable = false)
     private String content;
 
@@ -31,8 +34,9 @@ public class Missatge implements Serializable{
         this.createdAt = new Date();
     }
 
-    public Missatge(User user, String content) {
+    public Missatge(User user, String titulo, String content) {
         this.user = user;
+        this.titulo = titulo;
         this.content = content;
         this.createdAt = new Date();
     }
@@ -51,6 +55,14 @@ public class Missatge implements Serializable{
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
 
     public String getContent() {

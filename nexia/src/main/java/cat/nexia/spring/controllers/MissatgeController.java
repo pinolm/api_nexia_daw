@@ -62,7 +62,8 @@ public class MissatgeController {
                         missatge.getId(),
                         missatge.getUser().getId(),
                         missatge.getUser().getUsername(),
-                        missatge.getContent()))
+                        missatge.getContent(),
+                        missatge.getTitulo()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(responseDtoList);
@@ -96,6 +97,7 @@ public class MissatgeController {
                     missatge.getUser().getId(),
                     username,
                     missatge.getContent(),
+                    missatge.getTitulo(),
                     missatge.getCreatedAt());
 
             return ResponseEntity.ok(responseDto);
@@ -129,23 +131,23 @@ public class MissatgeController {
     public ResponseEntity<?> createMissatge(@RequestBody MissatgeRequestDto missatgeRequest,
             UriComponentsBuilder ucBuilder, Authentication authentication) {
 
-        User currentUser = null;
-        if (authentication != null && authentication.isAuthenticated()) {
-            currentUser = userService.findByUsername(authentication.getName());
-        }
-
-        if (currentUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new MissatgeSimpleResponseDto("Error al obtener el usuario actual."));
-        }
-
-        Missatge missatge = new Missatge(currentUser, missatgeRequest.getContent());
-
-        missatgeService.createMissatge(missatge);
-
-        return ResponseEntity.created(ucBuilder.path("/api/missatges/{id}").buildAndExpand(missatge.getId()).toUri())
-                .body(new MissatgeSimpleResponseDto("Mensaje creado exitosamente!"));
-    }
+                User currentUser = null;
+                if (authentication != null && authentication.isAuthenticated()) {
+                    currentUser = userService.findByUsername(authentication.getName());
+                }
+        
+                if (currentUser == null) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(new MissatgeSimpleResponseDto("Error al obtener el usuario actual."));
+                }
+        
+                Missatge missatge = new Missatge(currentUser, missatgeRequest.getTitulo(),missatgeRequest.getContent());
+        
+                missatgeService.createMissatge(missatge);
+        
+                return ResponseEntity.created(ucBuilder.path("/api/missatges/{id}").buildAndExpand(missatge.getId()).toUri())
+                        .body(new MissatgeSimpleResponseDto("Mensaje creado exitosamente!"));
+            }
 
     /**
      * Updates the content of a message identified by its ID.
@@ -170,31 +172,32 @@ public class MissatgeController {
     public ResponseEntity<Map<String, String>> updateMissatge(@PathVariable Long id, @RequestBody MissatgeRequestDto updatedMessageDto,
             Authentication authentication) {
 
-        Missatge existingMissatge = missatgeService.getMissatgeById(id);
+                Missatge existingMissatge = missatgeService.getMissatgeById(id);
 
-        if (existingMissatge != null) {
-
-            String currentUsername = authentication.getName();
-
-            if (!currentUsername.equals(existingMissatge.getUser().getUsername()) && !isAdmin(authentication)) {
-
-                Map<String, String> response = new HashMap<>();
-                response.put("Error", "No tienes permisos para actualizar este mensaje.");
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-            }
-
-            existingMissatge.setContent(updatedMessageDto.getContent());
-            missatgeService.createMissatge(existingMissatge);
-
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "El mensaje con ID " + id + " ha sido actualizado correctamente.");
-            return ResponseEntity.ok(response);
-        } else {
-
-            Map<String, String> response = new HashMap<>();
-            response.put("Error", "No se encontró el mensaje con el ID proporcionado.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+                if (existingMissatge != null) {
+            
+                    String currentUsername = authentication.getName();
+            
+                    if (!currentUsername.equals(existingMissatge.getUser().getUsername()) && !isAdmin(authentication)) {
+            
+                        Map<String, String> response = new HashMap<>();
+                        response.put("Error", "No tienes permisos para actualizar este mensaje.");
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+                    }
+            
+                    existingMissatge.setContent(updatedMessageDto.getContent());
+                    existingMissatge.setTitulo(updatedMessageDto.getTitulo());
+                    missatgeService.createMissatge(existingMissatge);
+            
+                    Map<String, String> response = new HashMap<>();
+                    response.put("message", "El mensaje con ID " + id + " ha sido actualizado correctamente.");
+                    return ResponseEntity.ok(response);
+                } else {
+            
+                    Map<String, String> response = new HashMap<>();
+                    response.put("Error", "No se encontró el mensaje con el ID proporcionado.");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                }
     }
 
     private boolean isAdmin(Authentication authentication) {
