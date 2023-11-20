@@ -29,14 +29,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
-  * User authentication and registration handler provides entry points
-  * to authenticate users, register new users and log out of the application.
-  */
+ * Controlador per gestionar l'autenticació i el registre d'usuaris,
+ * proporciona punts d'entrada per autenticar usuaris, registrar nous usuaris
+ * i tancar la sessió de l'aplicació.
+ */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-  
+
   @Autowired
   AuthenticationManager authenticationManager;
 
@@ -52,107 +53,113 @@ public class AuthController {
   @Autowired
   JwtUtils jwtUtils;
 
+  public static final String ROLE_ADMIN = "admin";
+  public static final String ROLE_MODERATOR = "mod";
+  public static final String ROLE_USER = "user";
+
+  public static final String ERROR_USERNAME_IN_USE = "Error: El nom d'usuari ja està en ús!";
+  public static final String ERROR_EMAIL_IN_USE = "Error: El correu electrònic ja està en ús!";
+  public static final String ERROR_ROLE_NOT_FOUND = "Error: Rol no trobat.";
+
+  public static final String SUCCESSFUL_USER_CREATION = "L'usuari s'ha creat amb èxit.";
+  public static final String SUCCESSFUL_LOGOUT = "L'usuari ha tancat la sessió amb èxit.";
+
   /**
-    * Authenticates the user and issues a JWT token for subsequent sessions.
-    *
-    * @param loginRequest The login details provided by the user.
-    * @return ResponseEntity with a JWT token and details of the authenticated user.
-    */
+   * Autentica l'usuari i emet un token JWT per a les sessions següents.
+   *
+   * @param loginRequest Les dades d'inici de sessió proporcionades per l'usuari.
+   * @return ResponseEntity amb un token JWT i detalls de l'usuari autenticat.
+   */
   @PostMapping("/login")
   public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequestDto loginRequest) {
-
     Authentication authentication = authenticationManager
         .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername().toLowerCase(),
-                loginRequest.getPassword()));
-
+            loginRequest.getPassword()));
     SecurityContextHolder.getContext().setAuthentication(authentication);
-
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
     ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
-
     List<String> roles = userDetails.getAuthorities().stream()
         .map(item -> item.getAuthority())
         .collect(Collectors.toList());
-
-      String jwtTokenValue = jwtCookie.getValue();
-
-      UserInfoResponseDto userInfoResponse = new UserInfoResponseDto(userDetails.getId(),
-                                   userDetails.getUsername(),
-                                   userDetails.getEmail(),
-                                   roles, jwtTokenValue);
-
-                                   return ResponseEntity.ok()
-                                   .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                                   .body(userInfoResponse);
+    String jwtTokenValue = jwtCookie.getValue();
+    UserInfoResponseDto userInfoResponse = new UserInfoResponseDto(userDetails.getId(),
+        userDetails.getUsername(),
+        userDetails.getEmail(),
+        roles, jwtTokenValue);
+    return ResponseEntity.ok()
+        .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+        .body(userInfoResponse);
   }
 
   /**
-    * Register a new user in the system with specific roles and permissions.
-    *
-    * @param signUpRequest The registration data provided by the new user.
-    * @return ResponseEntity with a success or error message.
-    */
+   * Registra un nou usuari al sistema amb rols i permisos específics.
+   *
+   * @param signUpRequest Les dades de registre proporcionades pel nou usuari.
+   * @return ResponseEntity amb un missatge d'èxit o d'error.
+   */
   @PostMapping("/register")
   public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequestDto signUpRequest) {
     if (userRepository.existsByUsername(signUpRequest.getUsername().toLowerCase())) {
-      return ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto("Error: Username is already taken!"));
+      return ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto(ERROR_USERNAME_IN_USE));
     }
 
     if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-      return ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto("Error: Email is already in use!"));
+      return ResponseEntity.badRequest()
+          .body(new MissatgeSimpleResponseDto(ERROR_EMAIL_IN_USE));
     }
 
-    // Create new user's account
+    // Crea el compte del nou usuari
     User user = new User(signUpRequest.getUsername().toLowerCase(),
-                         signUpRequest.getEmail(),
-                         encoder.encode(signUpRequest.getPassword()));
+        signUpRequest.getEmail(),
+        encoder.encode(signUpRequest.getPassword()));
 
-    Set<String> strRoles = signUpRequest.getRole();
-    Set<Role> roles = new HashSet<>();
-
-    if (strRoles == null) {
-      Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-          .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-      roles.add(userRole);
-    } else {
-      strRoles.forEach(role -> {
-        switch (role) {
-        case "admin":
-          Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-          roles.add(adminRole);
-
-          break;
-        case "mod":
-          Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-          roles.add(modRole);
-
-          break;
-        default:
-          Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-          roles.add(userRole);
-        }
-      });
-    }
-
-    user.setRoles(roles);
+    user.setRoles(getRolesFromRequest(signUpRequest));
     userRepository.save(user);
 
-    return ResponseEntity.ok(new MissatgeSimpleResponseDto("The user has been created successfully."));
+    return ResponseEntity.ok(new MissatgeSimpleResponseDto(SUCCESSFUL_USER_CREATION));
   }
 
   /**
-    * Logs out a user, invalidating the JWT token.
-    *
-    * @return ResponseEntity with a success message.
-    */
+   * Tanca la sessió d'un usuari, invalidant el token JWT.
+   *
+   * @return ResponseEntity amb un missatge d'èxit.
+   */
   @PostMapping("/logout")
   public ResponseEntity<?> logoutUser() {
     ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
     return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
-        .body(new MissatgeSimpleResponseDto("the user has successfully logged out"));
+        .body(new MissatgeSimpleResponseDto(SUCCESSFUL_LOGOUT));
   }
+
+  // Mètode per obtenir el rol a partir del nom del rol
+  private Role getRoleByName(String roleName) {
+    switch (roleName.toLowerCase()) {
+      case ROLE_ADMIN:
+        return roleRepository.findByName(ERole.ROLE_ADMIN)
+            .orElseThrow(() -> new RuntimeException(ERROR_ROLE_NOT_FOUND + ": " + roleName));
+      case ROLE_MODERATOR:
+        return roleRepository.findByName(ERole.ROLE_MODERATOR)
+            .orElseThrow(() -> new RuntimeException(ERROR_ROLE_NOT_FOUND + ": " + roleName));
+      case ROLE_USER:
+        return roleRepository.findByName(ERole.ROLE_USER)
+            .orElseThrow(() -> new RuntimeException(ERROR_ROLE_NOT_FOUND + ": " + roleName));
+      default:
+        throw new IllegalArgumentException("Rol desconegut: " + roleName);
+    }
+  }
+
+  // Mètode per a registrar usuaris amb rols
+  private Set<Role> getRolesFromRequest(RegisterRequestDto signUpRequest) {
+    Set<String> strRoles = signUpRequest.getRole();
+    Set<Role> roles = new HashSet<>();
+
+    if (strRoles == null || strRoles.isEmpty()) {
+      roles.add(getRoleByName(ROLE_USER));
+    } else {
+      strRoles.forEach(role -> roles.add(getRoleByName(role)));
+    }
+
+    return roles;
+  }
+
 }

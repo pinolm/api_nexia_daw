@@ -13,16 +13,16 @@ import cat.nexia.spring.repository.RespuestaRepository;
 import cat.nexia.spring.repository.UserRepository;
 
 @Service
-public class RespuestaServiceImpl implements RespuestaService{
+public class RespostaServiceImpl implements RespostaService {
 
     private final RespuestaRepository respuestaRepository;
     private final UserRepository userRepository;
     private final MissatgeRepository missatgeRepository;
 
     @Autowired
-    public RespuestaServiceImpl(RespuestaRepository respuestaRepository, 
-                                UserRepository userRepository,
-                                MissatgeRepository missatgeRepository) {
+    public RespostaServiceImpl(RespuestaRepository respuestaRepository,
+            UserRepository userRepository,
+            MissatgeRepository missatgeRepository) {
         this.respuestaRepository = respuestaRepository;
         this.userRepository = userRepository;
         this.missatgeRepository = missatgeRepository;

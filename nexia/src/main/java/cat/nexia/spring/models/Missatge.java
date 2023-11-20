@@ -7,8 +7,8 @@ import java.util.Date;
 
 @Entity
 @Table(name = "missatges")
-public class Missatge implements Serializable{
-    
+public class Missatge implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -21,9 +21,9 @@ public class Missatge implements Serializable{
     private User user;
 
     @Column(name = "titol_missatge")
-    private String titulo;
+    private String title;
 
-    @Column(name = "missatge",nullable = false)
+    @Column(name = "missatge", nullable = false)
     private String content;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -34,9 +34,9 @@ public class Missatge implements Serializable{
         this.createdAt = new Date();
     }
 
-    public Missatge(User user, String titulo, String content) {
+    public Missatge(User user, String title, String content) {
         this.user = user;
-        this.titulo = titulo;
+        this.title = title;
         this.content = content;
         this.createdAt = new Date();
     }
@@ -57,12 +57,12 @@ public class Missatge implements Serializable{
         this.user = user;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public String getTitle() {
+        return title;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getContent() {

@@ -28,14 +28,37 @@ import cat.nexia.spring.models.User;
 import cat.nexia.spring.service.MissatgeService;
 import cat.nexia.spring.service.UserService;
 
+/**
+ * Controlador que gestiona els missatges i les operacions relacionades.
+ */
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api/missatge")
 public class MissatgeController {
 
+    // Serveis
     private final MissatgeService missatgeService;
-
     private final UserService userService;
+
+    // Constants per als missatges d'error i d'èxit
+    private static final String ERROR_MESSAGE_NOT_FOUND = "No s'ha trobat el missatge amb l'ID proporcionat.";
+    private static final String ERROR_MESSAGE_UPDATE_PERMISSION = "No tens permisos per actualitzar aquest missatge.";
+    private static final String ERROR_MESSAGE_GETTING_CURRENT_USER = "Error al obtenir l'usuari actual.";
+
+    private static final String SUCCESS_MESSAGE_CREATE = "Missatge creat amb èxit!";
+    private static final String SUCCESS_MESSAGE_UPDATE = "El missatge amb ID %d s'ha actualitzat correctament.";
+    private static final String SUCCESS_MESSAGE_DELETE = "El missatge amb ID %d s'ha eliminat correctament.";
+
+    // Altres constants
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+    private static final String ROLE_USER = "ROLE_USER";
+
+    /**
+     * Constructor que injecta els serveis necessaris pel controlador.
+     *
+     * @param missatgeService Servei per gestionar les operacions amb missatges.
+     * @param userService     Servei per gestionar les operacions amb usuaris.
+     */
 
     public MissatgeController(MissatgeService missatgeService, UserService userService) {
         this.missatgeService = missatgeService;
@@ -43,181 +66,144 @@ public class MissatgeController {
     }
 
     /**
-     * Gets the list of all messages.
+     * Obté la llista de tots els missatges.
      *
-     * This endpoint allows users to get a list of all available messages.
-     * Permission of any user is required to access this resource.
+     * Aquest endpoint permet als usuaris obtenir una llista de tots els missatges
+     * disponibles.
+     * Es requereix el permís de qualsevol usuari per accedir a aquest recurs.
      *
-     * @return ResponseEntity with a list of MissatgeResponseDto objects in the
-     *         response body.
+     * @return ResponseEntity amb una llista d'objectes MissatgeResponseDto al cos
+     *         de la resposta.
      */
     @GetMapping("/list")
     @PreAuthorize("permitAll()")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public ResponseEntity<List<MissatgeResponseDto>> getAllMissatges() {
         List<Missatge> missatges = missatgeService.getAllMissatges();
-
-        List<MissatgeResponseDto> responseDtoList = missatges.stream()
-                .map(missatge -> new MissatgeResponseDto(
-                        missatge.getId(),
-                        missatge.getUser().getId(),
-                        missatge.getUser().getUsername(),
-                        missatge.getContent(),
-                        missatge.getTitulo()))
-                .collect(Collectors.toList());
-
+        List<MissatgeResponseDto> responseDtoList = convertToResponseDtoList(missatges);
         return ResponseEntity.ok(responseDtoList);
+
     }
 
     /**
-     * Gets a message by its ID.
+     * Obté els detalls d'un missatge pel seu ID.
      *
-     * This endpoint allows users to get details of a specific message
-     * identified by your ID. If the message exists, a successful response is
-     * returned with message details. If the message is not found, a response is returned
-     * 404 (Not Found) with an error message.
+     * Aquest endpoint permet als usuaris obtenir els detalls d'un missatge
+     * específic identificat pel seu ID.
+     * Si el missatge existeix, es retorna una resposta reeixida amb els detalls del
+     * missatge.
+     * Si el missatge no es troba, es retorna una resposta 404 (No trobat) amb un
+     * missatge d'error.
      *
-     * @param id The ID of the message to retrieve.
-     * @return ResponseEntity with a MissatgeDetailResponseDto object in the
-     *         response body
-     *         if the message is found. If the message does not exist, a response is
-     *         returned with
-     *         status 404 and a map containing an error message.
+     * @param id L'ID del missatge a recuperar.
+     * @return ResponseEntity amb un objecte MissatgeDetailResponseDto al cos de la
+     *         resposta si es troba el missatge.
+     *         Si el missatge no existeix, es retorna una resposta amb l'estat 404 i
+     *         un mapa que conté un missatge d'error.
      */
     @GetMapping("/getById/{id}")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public ResponseEntity<?> getMissatgeById(@PathVariable Long id) {
         Missatge missatge = missatgeService.getMissatgeById(id);
-
-        if (missatge != null) {
-            String username = userService.getUsuariById(missatge.getUser().getId()).getUsername();
-
-            MissatgeDetailResponseDto responseDto = new MissatgeDetailResponseDto(
-                    missatge.getId(),
-                    missatge.getUser().getId(),
-                    username,
-                    missatge.getContent(),
-                    missatge.getTitulo(),
-                    missatge.getCreatedAt());
-
-            return ResponseEntity.ok(responseDto);
-        } else {
-            Map<String, String> response = new HashMap<>();
-            response.put("Error", "No se encontró el mensaje con el ID proporcionado.");
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+        return (missatge != null)
+                ? ResponseEntity.ok(convertToDetailResponseDto(missatge))
+                : buildErrorResponse(ERROR_MESSAGE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     /**
-     * Create a new message. Authentication required and the current user is
-     * obtained from the provided Authentication object.
+     * Crea un nou missatge.
      *
-     * @param missatgeRequest The message information to create, provided in the
-     *                        request body.
-     * @param ucBuilder       Used to construct the response URI indicating
-     *                        successful creation of the message.
-     * @param authentication  Authentication object that represents the
-     *                        authentication information of the current user.
-     * @return ResponseEntity with a successful response and a
-     *         MissatgeSimpleResponseDto object if the message is created
-     *         successfully.
-     *         If there is a problem with authentication, an unauthorized response
-     *         is returned with an error message.
+     * L'autenticació és necessària i l'usuari actual s'obté de l'objecte
+     * Authentication proporcionat.
+     *
+     * @param missatgeRequest La informació del missatge a crear, proporcionada al
+     *                        cos de la sol·licitud.
+     * @param ucBuilder       S'utilitza per construir la URI de resposta que indica
+     *                        la creació reeixida del missatge.
+     * @param authentication  Objecte Authentication que representa la informació
+     *                        d'autenticació de l'usuari actual.
+     * @return ResponseEntity amb una resposta reeixida i un objecte
+     *         MissatgeSimpleResponseDto si el missatge es crea amb èxit.
+     *         Si hi ha un problema amb l'autenticació, es retorna una resposta no
+     *         autoritzada amb un missatge d'error.
      */
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('" + ROLE_ADMIN + "') or hasRole('" + ROLE_USER + "')")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public ResponseEntity<?> createMissatge(@RequestBody MissatgeRequestDto missatgeRequest,
             UriComponentsBuilder ucBuilder, Authentication authentication) {
 
-                User currentUser = null;
-                if (authentication != null && authentication.isAuthenticated()) {
-                    currentUser = userService.findByUsername(authentication.getName());
-                }
-        
-                if (currentUser == null) {
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                            .body(new MissatgeSimpleResponseDto("Error al obtener el usuario actual."));
-                }
-        
-                Missatge missatge = new Missatge(currentUser, missatgeRequest.getTitulo(),missatgeRequest.getContent());
-        
-                missatgeService.createMissatge(missatge);
-        
-                return ResponseEntity.created(ucBuilder.path("/api/missatges/{id}").buildAndExpand(missatge.getId()).toUri())
-                        .body(new MissatgeSimpleResponseDto("Mensaje creado exitosamente!"));
-            }
+        User currentUser = getCurrentUser(authentication);
+
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new MissatgeSimpleResponseDto(ERROR_MESSAGE_GETTING_CURRENT_USER));
+        }
+
+        Missatge missatge = new Missatge(currentUser, missatgeRequest.getTitle(), missatgeRequest.getContent());
+        missatgeService.createMissatge(missatge);
+
+        // Retorna una resposta CREATED amb un missatge d'èxit
+        return buildSuccessResponse(SUCCESS_MESSAGE_CREATE, HttpStatus.CREATED);
+
+    }
 
     /**
-     * Updates the content of a message identified by its ID.
-     * If the message exists and the current user has the necessary permissions (is
-     * the owner of the message or is a administrator),
-     * the content of the message is updated and a successful response is returned.
-     * If the message is not found with the provided ID, a
-     * 404 (Not Found) response with an error message.
+     * Actualitza el contingut d'un missatge identificat pel seu ID. Si el missatge
+     * existeix i l'usuari actual té els permisos necessaris (és el propietari del
+     * missatge o és un administrador), es
+     * actualitza el contingut del missatge i es retorna una resposta reeixida. Si
+     * el
+     * missatge no es troba amb l'ID proporcionat,
+     * es retorna una resposta 404 (No trobat) amb un missatge d'error.
      *
-     * @param id                The ID of the message to update.
-     * @param updatedMessageDto The MissatgeRequestDto object containing the new
-     *                          message content, provided in the request body.
-     * @param authentication    Authentication object that represents the
-     *                          information
-     *                          Authentication of the current user.
-     * @return ResponseEntity with a Map containing a success message if the
-     *         message is updated successfully,
-     *         or an error message if the message with the given ID is not found.
+     * @param id                L'ID del missatge a actualitzar.
+     * @param updatedMessageDto El missatge MissatgeRequestDto que conté el nou
+     *                          contingut del missatge, proporcionat al cos de la
+     *                          sol·licitud.
+     * @param authentication    Objecte Authentication que representa la informació
+     *                          d'autenticació de l'usuari actual.
+     * @return ResponseEntity amb un mapa que conté un missatge d'èxit si el
+     *         missatge
+     *         s'actualitza correctament, o un missatge d'error si no es troba el
+     *         missatge amb l'ID proporcionat.
      */
     @PutMapping("/update/{id}")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public ResponseEntity<Map<String, String>> updateMissatge(@PathVariable Long id, @RequestBody MissatgeRequestDto updatedMessageDto,
+    public ResponseEntity<Map<String, String>> updateMissatge(@PathVariable Long id,
+            @RequestBody MissatgeRequestDto updatedMessageDto,
             Authentication authentication) {
 
-                Missatge existingMissatge = missatgeService.getMissatgeById(id);
+        Missatge existingMissatge = missatgeService.getMissatgeById(id);
 
-                if (existingMissatge != null) {
-            
-                    String currentUsername = authentication.getName();
-            
-                    if (!currentUsername.equals(existingMissatge.getUser().getUsername()) && !isAdmin(authentication)) {
-            
-                        Map<String, String> response = new HashMap<>();
-                        response.put("Error", "No tienes permisos para actualizar este mensaje.");
-                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-                    }
-            
-                    existingMissatge.setContent(updatedMessageDto.getContent());
-                    existingMissatge.setTitulo(updatedMessageDto.getTitulo());
-                    missatgeService.createMissatge(existingMissatge);
-            
-                    Map<String, String> response = new HashMap<>();
-                    response.put("message", "El mensaje con ID " + id + " ha sido actualizado correctamente.");
-                    return ResponseEntity.ok(response);
-                } else {
-            
-                    Map<String, String> response = new HashMap<>();
-                    response.put("Error", "No se encontró el mensaje con el ID proporcionado.");
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-                }
-    }
+        if (existingMissatge != null) {
+            String currentUsername = authentication.getName();
 
-    private boolean isAdmin(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+            if (!currentUsername.equals(existingMissatge.getUser().getUsername()) && !isAdmin(authentication)) {
+                return buildErrorResponse(ERROR_MESSAGE_UPDATE_PERMISSION, HttpStatus.FORBIDDEN);
+            }
+            updateMissatgeContentAndTitle(existingMissatge, updatedMessageDto);
+            missatgeService.createMissatge(existingMissatge);
+            return buildSuccessResponse(String.format(SUCCESS_MESSAGE_UPDATE, id), HttpStatus.OK);
+        } else {
+            return buildErrorResponse(ERROR_MESSAGE_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
     }
 
     /**
-     * Delete a message by its ID.
+     * Elimina un missatge pel seu ID.
      *
-     * A valid message ID is expected as part of the URL. If the message exists, it
-     * is deleted and returned.
-     * a successful response indicating that the message has been successfully
-     * deleted. If the message is not found
-     * with the given ID, a NOT_FOUND response is returned with an error message.
+     * Espera un ID de missatge vàlid com a part de la URL. Si el missatge existeix,
+     * s'elimina i es retorna una resposta
+     * reeixida que indica que el missatge s'ha eliminat correctament. Si no es
+     * troba el missatge amb l'ID proporcionat,
+     * es retorna una resposta NOT_FOUND amb un missatge d'error.
      *
-     * @param id The ID of the message to delete, provided as part of the URL.
-     * @return ResponseEntity with a Map containing a success message if the message
-     *         is successfully deleted,
-     *         or an error message if the message with the given ID is not found.
+     * @param id L'ID del missatge a eliminar, proporcionat com a part de la URL.
+     * @return ResponseEntity amb un mapa que conté un missatge d'èxit si el
+     *         missatge
+     *         s'elimina correctament, o un missatge d'error si no es troba el
+     *         missatge amb l'ID proporcionat.
      */
     @DeleteMapping("/deleteById/{id}")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -227,15 +213,149 @@ public class MissatgeController {
         if (missatge != null) {
             missatgeService.deleteMissatge(id);
 
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "El mensaje con ID " + id + " ha sido eliminado correctamente.");
-            return ResponseEntity.ok(response);
+            return buildSuccessResponse(String.format(SUCCESS_MESSAGE_DELETE, id), HttpStatus.OK);
 
         } else {
-            Map<String, String> response = new HashMap<>();
-            response.put("Error", "No se encontró el mensaje con el ID proporcionado.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+
+            return buildErrorResponse(ERROR_MESSAGE_NOT_FOUND, HttpStatus.NOT_FOUND);
+
         }
+    }
+
+    /**
+     * Obté l'usuari actual a partir de l'objecte Authentication.
+     *
+     * @param authentication Objecte Authentication que representa la informació
+     *                       d'autenticació de l'usuari actual.
+     * @return L'usuari actual o null si no s'ha autenticat correctament.
+     */
+    private User getCurrentUser(Authentication authentication) {
+        return (authentication != null && authentication.isAuthenticated())
+                ? userService.findByUsername(authentication.getName())
+                : null;
+    }
+
+    /**
+     * Verifica si l'usuari té el rol d'administrador.
+     *
+     * @param authentication Objecte Authentication que representa la informació
+     *                       d'autenticació de l'usuari actual.
+     * @return Cert si l'usuari té el rol d'administrador; fals en cas contrari.
+     */
+
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals(ROLE_ADMIN));
+    }
+
+    /**
+     * Construeix i retorna una ResponseEntity amb un cos que conté un missatge.
+     *
+     * Aquest mètode pren una clau (`key`), un missatge (`message`) i
+     * un estat HTTP (`status`) per construir una resposta consistent.
+     * El cos de la resposta és un mapa amb la clau proporcionada
+     * i el missatge associat (ja sigui d'error o d'èxit).
+     * L'estat HTTP indica l'estat de la resposta.
+     *
+     * @param key     La clau associada al missatge (pot ser "error" o "message").
+     * @param message El missatge a incloure en la resposta.
+     * @param status  L'estat HTTP de la resposta.
+     * @return Una ResponseEntity amb el cos del mapa que conté la clau i el
+     *         missatge, amb l'estat HTTP indicat.
+     */
+    private ResponseEntity<Map<String, String>> buildResponse(String key, String message, HttpStatus status) {
+        Map<String, String> response = new HashMap<>();
+        response.put(key, message);
+        return ResponseEntity.status(status).body(response);
+    }
+
+    /**
+     * Construeix i retorna una ResponseEntity amb un cos que conté un missatge
+     * d'error.
+     *
+     * Aquest mètode utilitza el mètode buildResponse per construir una resposta
+     * amb la clau "error" i el missatge d'error associat.
+     *
+     * @param message El missatge d'error a incloure en la resposta.
+     * @param status  L'estat HTTP de la resposta.
+     * @return Una ResponseEntity amb el cos del mapa que conté la clau "error" i el
+     *         missatge d'error, amb l'estat HTTP indicat.
+     */
+    private ResponseEntity<Map<String, String>> buildErrorResponse(String message, HttpStatus status) {
+        return buildResponse("error", message, status);
+    }
+
+    /**
+     * Construeix i retorna una ResponseEntity amb un cos que conté un missatge
+     * d'èxit.
+     *
+     * Aquest mètode utilitza el mètode buildResponse per construir una resposta
+     * amb la clau "message" i el missatge d'èxit associat.
+     *
+     * @param message El missatge d'èxit a incloure en la resposta.
+     * @param status  L'estat HTTP de la resposta.
+     * @return Una ResponseEntity amb el cos del mapa que conté la clau "message" i
+     *         el
+     *         missatge d'èxit, amb l'estat HTTP indicat.
+     */
+    private ResponseEntity<Map<String, String>> buildSuccessResponse(String message, HttpStatus status) {
+        return buildResponse("message", message, status);
+    }
+
+    /**
+     * Converteix una llista de missatges a una llista de DTO de resposta.
+     *
+     * @param missatges Llista de missatges a convertir.
+     * @return Llista de DTO de resposta de missatge.
+     */
+    private List<MissatgeResponseDto> convertToResponseDtoList(List<Missatge> missatges) {
+        return missatges.stream()
+                .map(this::convertToResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Converteix un missatge a un DTO de resposta.
+     *
+     * @param missatge Missatge a convertir.
+     * @return DTO de resposta de missatge.
+     */
+    private MissatgeResponseDto convertToResponseDto(Missatge missatge) {
+        return new MissatgeResponseDto(
+                missatge.getId(),
+                missatge.getUser().getId(),
+                missatge.getUser().getUsername(),
+                missatge.getContent(),
+                missatge.getTitle());
+    }
+
+    /**
+     * Converteix un missatge a un DTO de resposta detallat.
+     *
+     * @param missatge Missatge a convertir.
+     * @return DTO de resposta detallat de missatge.
+     */
+    private MissatgeDetailResponseDto convertToDetailResponseDto(Missatge missatge) {
+        String username = userService.getUsuariById(missatge.getUser().getId()).getUsername();
+        return new MissatgeDetailResponseDto(
+                missatge.getId(),
+                missatge.getUser().getId(),
+                username,
+                missatge.getContent(),
+                missatge.getTitle(),
+                missatge.getCreatedAt());
+    }
+
+    /**
+     * Actualitza el contingut i el títol d'un missatge amb les dades proporcionades
+     * en un DTO.
+     *
+     * @param missatge          Missatge a actualitzar.
+     * @param updatedMessageDto Dades de missatge actualitzades.
+     */
+    private void updateMissatgeContentAndTitle(Missatge missatge, MissatgeRequestDto updatedMessageDto) {
+        missatge.setContent(updatedMessageDto.getContent());
+        missatge.setTitle(updatedMessageDto.getTitle());
     }
 
 }

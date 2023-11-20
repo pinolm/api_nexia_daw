@@ -2,14 +2,14 @@ package cat.nexia.spring.dto.request;
 
 import javax.validation.constraints.NotBlank;
 
-public class CrearRespuestaRequestDto {
+public class CrearRespostaRequestDto {
 
     private Long missatgeId;
 
     private Long userId;
 
     @NotBlank
-    private String contenido;
+    private String content;
 
     public Long getMissatgeId() {
         return missatgeId;
@@ -27,12 +27,12 @@ public class CrearRespuestaRequestDto {
         this.userId = userId;
     }
 
-    public String getContenido() {
-        return contenido;
+    public String getContent() {
+        return content;
     }
 
-    public void setContenido(String contenido) {
-        this.contenido = contenido;
+    public void setContent(String content) {
+        this.content = content;
     }
-    
+
 }
