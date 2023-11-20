@@ -46,6 +46,9 @@ public class UserController {
     // Constants per als rols d'autorització i missatges d'error
     private static final String AUTHORIZATION_ROLES = "hasAnyRole('ROLE_ADMIN', 'ROLE_USER')";
     private static final String ERROR_USER_NOT_AUTHORIZED = "No té permisos per accedir a la llista d'usuaris.";
+    public static final String ROLE_ADMIN = "admin";
+    public static final String ROLE_MODERATOR = "mod";
+    public static final String ROLE_USER = "user";
 
     private static final String ERROR_USER_NOT_FOUND = "Usuari no trobat. Si us plau, introdueixi un ID vàlid.";
     private static final String ERROR_USERNAME_IN_USE = "Error: El nom d'usuari ja està en ús!";
@@ -324,14 +327,26 @@ public class UserController {
     }
 
     /**
-     * Obté un objecte Role a partir del nom del rol.
+     * Obtenir el rol a partir del nom del rol.
      *
      * @param roleName Nom del rol.
-     * @return Un objecte Role trobat pel nom o llança una excepció si no es troba.
+     * @return Rol corresponent al nom especificat.
+     * @throws IllegalArgumentException Si el rol no es troba o és desconegut.
      */
     private Role getRoleByName(String roleName) {
-        return roleRepository.findByName(ERole.valueOf(roleName.toUpperCase()))
-                .orElseThrow(() -> new RuntimeException(ERROR_ROLE_NOT_FOUND));
+        switch (roleName.toLowerCase()) {
+            case ROLE_ADMIN:
+                return roleRepository.findByName(ERole.ROLE_ADMIN)
+                        .orElseThrow(() -> new RuntimeException(ERROR_ROLE_NOT_FOUND + ": " + roleName));
+            case ROLE_MODERATOR:
+                return roleRepository.findByName(ERole.ROLE_MODERATOR)
+                        .orElseThrow(() -> new RuntimeException(ERROR_ROLE_NOT_FOUND + ": " + roleName));
+            case ROLE_USER:
+                return roleRepository.findByName(ERole.ROLE_USER)
+                        .orElseThrow(() -> new RuntimeException(ERROR_ROLE_NOT_FOUND + ": " + roleName));
+            default:
+                throw new IllegalArgumentException("Rol desconegut: " + roleName);
+        }
     }
 
     private void updateUserDetails(User user, UpdateUserRequestDto updateUserRequest) {
