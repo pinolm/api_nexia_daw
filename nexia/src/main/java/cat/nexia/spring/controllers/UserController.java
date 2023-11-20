@@ -10,6 +10,7 @@ import cat.nexia.spring.models.User;
 import cat.nexia.spring.repository.RoleRepository;
 import cat.nexia.spring.repository.UserRepository;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +20,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import java.util.HashSet;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Controller to manage CRUD operations related to users.
+ * Controlador per gestionar les operacions CRUD relacionades amb els usuaris.
  */
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -42,84 +43,239 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // Constants per als rols d'autorització i missatges d'error
+    private static final String AUTHORIZATION_ROLES = "hasAnyRole('ROLE_ADMIN', 'ROLE_USER')";
+    private static final String ERROR_USER_NOT_AUTHORIZED = "No té permisos per accedir a la llista d'usuaris.";
+
+    private static final String ERROR_USER_NOT_FOUND = "Usuari no trobat. Si us plau, introdueixi un ID vàlid.";
+    private static final String ERROR_USERNAME_IN_USE = "Error: El nom d'usuari ja està en ús!";
+    private static final String ERROR_EMAIL_IN_USE = "Error: El correu electrònic ja està en ús!";
+
+    private static final String ERROR_USER_DELETE_NOT_FOUND = "Error: Usuari no trobat.";
+    private static final String ERROR_ROLE_NOT_FOUND = "Error: Rol no trobat.";
+    private static final String ERROR_USER_NOT_EXIST = "Error: L'usuari no existeix.";
+
+    private static final String SUCCESS_USER_CREATED = "Usuari creat amb èxit!";
+    private static final String SUCCESS_USER_DELETED = "Usuari eliminat amb èxit.";
+    private static final String SUCCESS_USER_UPDATED = "Usuari actualitzat amb èxit.";
+
     /**
-     * Gets a list of users.
+     * Obté una llista d'usuaris.
      *
-     * This endpoint allows users with user or administrator roles to obtain a list
-     * of users registered on the system.
-     * Depending on the permissions of the user making the request, all users will
-     * be shown (if you are an administrator) or only
-     * your own profile details (if you are a regular user). If the user does not
-     * have the appropriate permissions to access the list
-     * of users, a 401 (Unauthorized) status code will be returned along with an
-     * error message.
+     * Aquest endpoint permet als usuaris amb rols d'usuari o administrador obtenir
+     * una llista d'usuaris registrats al sistema.
+     * Segons els permisos de l'usuari que fa la sol·licitud, es mostraran tots els
+     * usuaris (si ets administrador) o només els detalls del teu propi perfil (si
+     * ets un usuari regular).
+     * Si l'usuari no té els permisos adequats per accedir a la llista d'usuaris,
+     * es retornarà un codi d'estat 401 (No autoritzat) amb un missatge d'error.
      *
-     * @return A ResponseEntity object containing a list of registered users or an
-     *         error message in case of missing permissions.
+     * @return Un objecte ResponseEntity que conté una llista d'usuaris registrats o
+     *         un missatge d'error en cas de permisos insuficients.
      */
     @GetMapping("/list")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize(AUTHORIZATION_ROLES)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public ResponseEntity<?> userList() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         if (hasRoleAdmin(authentication)) {
             List<User> users = userRepository.findAll();
-
             List<UserListResponseDto> userResponses = users.stream()
-                    .map(user -> new UserListResponseDto(
-                            user.getId(),
-                            user.getUsername(),
-                            user.getEmail(),
-                            user.getNumber(),
-                            user.getAddress(),
-                            user.getCity(),
-                            user.getCountry(),
-                            user.getPostalCode(),
-                            user.getGender(),
-                            user.getName(),
-                            user.getSurname()))
+                    .map(this::mapUserToUserListResponseDto)
                     .collect(Collectors.toList());
-
             return ResponseEntity.ok(userResponses);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new MissatgeSimpleResponseDto("No tiene permisos para acceder a la lista de usuarios."));
+                    .body(new MissatgeSimpleResponseDto(ERROR_USER_NOT_AUTHORIZED));
         }
     }
 
     /**
-     * Checks if the authenticated user has the administrator role (ROLE_ADMIN).
+     * Obté els detalls d'un usuari pel seu ID.
      *
-     * @param authentication The Authentication object that represents the user's
-     *                       authentication information.
-     * @return true if the user has the administrator role (ROLE_ADMIN), otherwise
-     *         returns false.
-     */
-    private boolean hasRoleAdmin(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-    }
-
-    /**
-     * Obtain the details of a user for your ID.
-     *
-     * @param userId The ID of the user that is nearby.
-     * @return ResponseEntity with user details if it is troba or a missatge
-     *         d'error if it is not troba.
+     * @param userId L'ID de l'usuari a trobar.
+     * @return ResponseEntity amb els detalls de l'usuari si es troba o un missatge
+     *         d'error si no es troba.
      */
     @GetMapping("/findById/{userId}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize(AUTHORIZATION_ROLES)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public ResponseEntity<?> findUserById(@PathVariable Long userId) {
         User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
+        return user != null ? ResponseEntity.ok(mapUserToUserListResponseDto(user))
+                : ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new MissatgeSimpleResponseDto(ERROR_USER_NOT_FOUND));
+    }
+
+    /**
+     * Obté informació sobre un usuari pel seu nom d'usuari.
+     *
+     * Aquest endpoint permet als usuaris amb rols d'administrador o usuari obtenir
+     * informació detallada d'un usuari específic a través del seu nom d'usuari.
+     * Si l'usuari que fa la sol·licitud no té els permisos adequats per accedir a
+     * aquesta informació, es retornarà un codi d'estat 401 (No autoritzat)
+     * juntament amb un missatge d'error.
+     *
+     * @param username El nom d'usuari de l'usuari a consultar.
+     * @return Un objecte ResponseEntity amb la informació de l'usuari si es troba,
+     *         o un missatge d'error si no es troba o si l'usuari no té permisos
+     *         per accedir a aquesta informació.
+     */
+    @GetMapping("/findByUsername/{username}")
+    @PreAuthorize(AUTHORIZATION_ROLES)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public ResponseEntity<?> findUserByUsername(@PathVariable String username) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            UserListResponseDto response = mapUserToUserListResponseDto(user);
+            return ResponseEntity.ok(response);
+        } else {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body(new MissatgeSimpleResponseDto("Usuario no encontrado. Por favor, introduzca un ID válido."));
+                    .body(new MissatgeSimpleResponseDto(ERROR_USER_NOT_FOUND));
+        }
+    }
+
+    /**
+     * Crea un nou usuari al sistema.
+     *
+     * Aquest endpoint permet als usuaris amb rols d'administrador o usuari crear un
+     * nou usuari al sistema.
+     * Si l'usuari que fa la sol·licitud no té els permisos adequats per
+     * crear un nou usuari, es retornarà
+     * un codi d'estat 401 (No autoritzat) juntament amb un missatge d'error. A més,
+     * es validarà que el nom d'usuari i el correu electrònic no estiguin en ús.
+     * Si ja existeixen, es retornarà un codi d'estat 400 (Petició incorrecta).
+     * amb un missatge d'error corresponent.
+     *
+     * @param createUserRequest Detalls de l'usuari a crear.
+     * @param ucBuilder         El generador d'URI per a la ubicació del nou usuari.
+     * @return Un objecte ResponseEntity que indica si l'usuari s'ha creat
+     *         correctament o si hi ha hagut un error.
+     */
+    @PostMapping("/create")
+    @PreAuthorize(AUTHORIZATION_ROLES)
+    public ResponseEntity<?> createUser(@RequestBody CreateUserRequestDto createUserRequest,
+            UriComponentsBuilder ucBuilder) {
+        if (userRepository.existsByUsername(createUserRequest.getUsername())) {
+            return ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto(ERROR_USERNAME_IN_USE));
         }
 
-        UserListResponseDto response = new UserListResponseDto(
+        if (userRepository.existsByEmail(createUserRequest.getEmail())) {
+            return ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto(ERROR_EMAIL_IN_USE));
+        }
+
+        User user = createUserFromRequest(createUserRequest);
+        userRepository.save(user);
+
+        return ResponseEntity.created(ucBuilder.path("/api/users/{id}").buildAndExpand(user.getId()).toUri())
+                .body(new MissatgeSimpleResponseDto(SUCCESS_USER_CREATED));
+    }
+
+    /**
+     * Elimina un usuari pel seu nom d'usuari.
+     *
+     * Aquest endpoint permet als usuaris amb rols d'administrador o usuari eliminar
+     * un usuari existent al sistema especificant el seu nom d'usuari.
+     * Si l'usuari que fa la sol·licitud no té els permisos adequats per eliminar
+     * un usuari, es retornarà un codi d'estat 401 (No autoritzat) juntament amb un
+     * missatge d'error.
+     * Si l'usuari amb el nom especificat no es troba al sistema, es retornarà un
+     * codi d'estat 400 (Petició incorrecta) amb un missatge d'error corresponent.
+     *
+     * @param username El nom d'usuari de l'usuari a eliminar.
+     * @return Un objecte ResponseEntity que indica si l'usuari s'ha eliminat
+     *         correctament o si hi ha hagut un error.
+     */
+    @DeleteMapping("/deleteByUsername/{username}")
+    @PreAuthorize(AUTHORIZATION_ROLES)
+    public ResponseEntity<?> deleteUser(@PathVariable String username) {
+        User user = userRepository.findByUsername(username).orElse(null);
+        return user != null ? ResponseEntity.ok(new MissatgeSimpleResponseDto(SUCCESS_USER_DELETED))
+                : ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto(ERROR_USER_DELETE_NOT_FOUND));
+    }
+
+    /**
+     * Elimina un usuari pel seu identificador (ID).
+     *
+     * Aquest endpoint permet als usuaris amb rols d'administrador o usuari eliminar
+     * un usuari existent al sistema especificant el seu ID.
+     * Si l'usuari que fa * la sol·licitud no té els permisos adequats per eliminar
+     * un usuari, es retornarà un codi d'estat 401 (No autoritzat) juntament amb
+     * un missatge d'error.
+     * Si l'usuari amb l'ID especificat no és es troba al sistema, es
+     * retornarà un codi d'estat 404 (No trobat) amb un missatge d'error
+     * corresponent.
+     *
+     * @param userId L'ID de l'usuari a eliminar.
+     * @return Un objecte ResponseEntity que indica si l'usuari s'ha eliminat
+     *         correctament o si hi ha hagut un error.
+     */
+    @DeleteMapping("/deleteById/{userId}")
+    @PreAuthorize(AUTHORIZATION_ROLES)
+    public ResponseEntity<?> deleteById(@PathVariable Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        return user != null ? ResponseEntity.ok(new MissatgeSimpleResponseDto(SUCCESS_USER_DELETED))
+                : ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new MissatgeSimpleResponseDto(ERROR_USER_NOT_FOUND));
+    }
+
+    /**
+     * Actualitza la informació d'un usuari existent pel seu identificador (ID).
+     *
+     * Aquest endpoint permet als usuaris amb rols d'usuari o administrador
+     * actualitzar la informació d'un usuari existent especificant el seu ID i
+     * proporcionant els detalls de l'actualització al cos de la sol·licitud.
+     * Si l'usuari que realitza la sol·licitud no té els permisos adequats per
+     * actualitzar un usuari, es retornarà un codi d'estat 401 (No autoritzat)
+     * juntament amb un missatge d'error.
+     * Si l'usuari amb l'ID especificat no es troba al sistema, es retornarà
+     * un codi d'estat 400 (Petició incorrecta) juntament amb un missatge d'error
+     * corresponent.
+     *
+     * @param userId            L'ID de l'usuari a actualitzar.
+     * @param updateUserRequest Un objecte que conté els detalls de l'actualització,
+     *                          com el nom, cognom, número de telèfon, adreça,
+     *                          etc.
+     * @return Un objecte ResponseEntity que indica si l'usuari s'ha actualitzat
+     *         correctament o si ha ocorregut un error.
+     */
+    @PutMapping("/update/{userId}")
+    @PreAuthorize(AUTHORIZATION_ROLES)
+    public ResponseEntity<?> updateUser(@PathVariable Long userId,
+            @RequestBody UpdateUserRequestDto updateUserRequest) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto(ERROR_USER_NOT_EXIST));
+        }
+        updateUserDetails(user, updateUserRequest);
+        userRepository.save(user);
+        return ResponseEntity.ok(new MissatgeSimpleResponseDto(SUCCESS_USER_UPDATED));
+    }
+
+    /**
+     * Comprova si l'usuari autenticat té el rol d'administrador (ROLE_ADMIN).
+     *
+     * @param authentication L'objecte d'autenticació que representa la informació
+     *                       d'autenticació de l'usuari.
+     * @return true si l'usuari té el rol d'administrador (ROLE_ADMIN), sinó
+     *         retorna false.
+     */
+    private boolean hasRoleAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals(ERole.ROLE_ADMIN.name()));
+    }
+
+    /**
+     * Mapa un objecte User a un objecte UserListResponseDto.
+     *
+     * @param user L'usuari a mapar.
+     * @return Un objecte UserListResponseDto mapejat des de l'usuari.
+     */
+
+    private UserListResponseDto mapUserToUserListResponseDto(User user) {
+        return new UserListResponseDto(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
@@ -131,95 +287,17 @@ public class UserController {
                 user.getGender(),
                 user.getName(),
                 user.getSurname());
-
-        return ResponseEntity.ok(response);
     }
 
     /**
-     * Gets information about a user by their username.
+     * Crea un objecte User a partir de les dades de la sol·licitud.
      *
-     * This endpoint allows users with administrator or user roles to obtain
-     * detailed information
-     * from a specific user through their username. If the user making the request
-     * does not have the appropriate permissions
-     * To access this information, a 401 (Unauthorized) status code will be returned
-     * along with an error message.
-     *
-     * @param username The username of the user to query.
-     * @return A ResponseEntity object with the user information if found, or an
-     *         error message if not found
-     *         or if the user does not have permissions to access this information.
+     * @param createUserRequest Detalls de l'usuari a crear.
+     * @return Un objecte User creat a partir de les dades de la sol·licitud.
      */
-    @GetMapping("/findByUsername/{username}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public ResponseEntity<?> findUserByUsername(@PathVariable String username) {
-
-        Optional<User> userOptional = userRepository.findByUsername(username);
-
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            UserListResponseDto response = new UserListResponseDto(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getEmail(),
-                    user.getNumber(),
-                    user.getAddress(),
-                    user.getCity(),
-                    user.getCountry(),
-                    user.getPostalCode(),
-                    user.getGender(),
-                    user.getName(),
-                    user.getSurname());
-
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new MissatgeSimpleResponseDto(
-                            "Usuario no encontrado. Por favor, introduzca un nombre de usuario válido."));
-        }
-
-    }
-
-    /**
-     * Create a new user in the system.
-     *
-     * This endpoint allows users with administrator or user roles to create a new
-     * user on the system.
-     * If the user making the request does not have the appropriate permissions to
-     * create a new user, it will be returned
-     * a 401 (Unauthorized) status code along with an error message. Additionally,
-     * it will be validated that the username
-     * and email are not in use. If they already exist, a status code 400 (Bad
-     * Request) will be returned.
-     * with a corresponding error message.
-     *
-     * @param createUserRequest The details of the user to create.
-     * @param ucBuilder         The URI generator for the new user's location.
-     * @return A ResponseEntity object indicating whether the user was created
-     *         successfully or if an error occurred.
-     */
-    @PostMapping("/create")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public ResponseEntity<?> createUser(@RequestBody CreateUserRequestDto createUserRequest,
-            UriComponentsBuilder ucBuilder) {
-        if (userRepository.existsByUsername(createUserRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MissatgeSimpleResponseDto("Error: El nombre de usuario ya está en uso!"));
-        }
-
-        if (userRepository.existsByEmail(createUserRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MissatgeSimpleResponseDto("Error: El correo electrónico ya está en uso!"));
-        }
-
+    private User createUserFromRequest(CreateUserRequestDto createUserRequest) {
         User user = new User(createUserRequest.getUsername(), createUserRequest.getEmail(),
                 passwordEncoder.encode(createUserRequest.getPassword()));
-
         user.setNumber(createUserRequest.getNumber());
         user.setAddress(createUserRequest.getAddress());
         user.setCity(createUserRequest.getCity());
@@ -228,171 +306,40 @@ public class UserController {
         user.setGender(createUserRequest.getGender());
         user.setName(createUserRequest.getName());
         user.setSurname(createUserRequest.getSurname());
-
         if (createUserRequest.getRole() != null) {
-            Set<Role> roles = new HashSet<>();
-            createUserRequest.getRole().forEach(role -> {
-                if ("admin".equals(role)) {
-                    Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                            .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
-                    roles.add(adminRole);
-                } else {
-                    Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                            .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
-                    roles.add(userRole);
-                }
-            });
+            Set<Role> roles = createUserRequest.getRole().stream()
+                    .map(this::getRoleByName)
+                    .collect(Collectors.toSet());
             user.setRoles(roles);
         }
-
-        userRepository.save(user);
-
-        return ResponseEntity.created(ucBuilder.path("/api/users/{id}").buildAndExpand(user.getId()).toUri())
-                .body(new MissatgeSimpleResponseDto("Usuario creado exitosamente!"));
+        return user;
     }
 
     /**
-     * Delete a user by username.
+     * Obté un objecte Role a partir del nom del rol.
      *
-     * This endpoint allows users with administrator or user roles to delete an
-     * existing user on the system
-     * specifying your username. If the user making the request does not have the
-     * appropriate permissions to delete
-     * a user, a 401 (Unauthorized) status code will be returned along with an error
-     * message. If the user with the name
-     * If the specified user is not found in the system, a 400 (Bad Request) status
-     * code will be returned with a
-     * corresponding error message.
-     *
-     * @param username The username of the user to be deleted.
-     * @return A ResponseEntity object indicating whether the user was deleted
-     *         successfully or if an error occurred.
+     * @param roleName Nom del rol.
+     * @return Un objecte Role trobat pel nom o llança una excepció si no es troba.
      */
-    @DeleteMapping("/deleteByUsername/{username}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public ResponseEntity<?> deleteUser(@PathVariable String username) {
-
-        User user = userRepository.findByUsername(username).orElse(null);
-
-        if (user == null) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MissatgeSimpleResponseDto("Error: Usuario no encontrado."));
-        }
-
-        userRepository.delete(user);
-
-        return ResponseEntity.ok(new MissatgeSimpleResponseDto("Usuario eliminado exitosamente."));
+    private Role getRoleByName(String roleName) {
+        return roleRepository.findByName(ERole.valueOf(roleName.toUpperCase()))
+                .orElseThrow(() -> new RuntimeException(ERROR_ROLE_NOT_FOUND));
     }
 
-    /**
-     * Deletes a user by their identifier (ID).
-     *
-     * This endpoint allows users with administrator or user roles to delete an
-     * existing user on the system
-     * specifying your ID. If the user making the request does not have the
-     * appropriate permissions to delete a user,
-     * will return a 401 (Unauthorized) status code along with an error message. If
-     * the user with the specified ID is not
-     * is found on the system, a 404 (Not Found) status code will be returned with a
-     * corresponding error message.
-     *
-     * @param userId The ID of the user to delete.
-     * @return A ResponseEntity object indicating whether the user was deleted
-     *         successfully or if an error occurred.
-     */
-    @DeleteMapping("/deleteById/{userId}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public ResponseEntity<?> deleteById(@PathVariable Long userId) {
-
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new MissatgeSimpleResponseDto("Usuario no encontrado. Por favor, introduzca un ID válido."));
-        }
-
-        userRepository.delete(user);
-
-        return ResponseEntity.ok(new MissatgeSimpleResponseDto("Usuario eliminado exitosamente."));
-    }
-
-    /**
-     * Updates the information of an existing user by their identifier (ID).
-     *
-     * This endpoint allows users with user or administrator roles to update
-     * information for an existing user
-     * specifying your ID and providing the update details in the request body. If
-     * the user who performs
-     * the request does not have the appropriate permissions to update a user, a 401
-     * (Unauthorized) status code will be returned
-     * along with an error message. If the user with the specified ID is not in the
-     * system, a login code will be returned.
-     * status 400 (Bad Request) with a corresponding error message.
-     *
-     * @param userId            The ID of the user to update.
-     * @param updateUserRequest An object containing the update details, such as
-     *                          first name, last name, phone number, address, etc.
-     * @return A ResponseEntity object indicating whether the user was updated
-     *         successfully or if an error occurred.
-     */
-    @PutMapping("/update/{userId}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public ResponseEntity<?> updateUser(@PathVariable Long userId,
-            @RequestBody UpdateUserRequestDto updateUserRequest) {
-
-        User user = userRepository.findById(userId).orElse(null);
-
-        if (user == null) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MissatgeSimpleResponseDto("Error: El usuario no existe."));
-        }
-
-        if (updateUserRequest.getEmail() != null) {
-            user.setEmail(updateUserRequest.getEmail());
-        }
-
-        if (updateUserRequest.getName() != null) {
-            user.setName(updateUserRequest.getName());
-        }
-
-        if (updateUserRequest.getSurname() != null) {
-            user.setSurname(updateUserRequest.getSurname());
-        }
-
-        if (updateUserRequest.getNumber() != null) {
-            user.setNumber(updateUserRequest.getNumber());
-        }
-
-        if (updateUserRequest.getAddress() != null) {
-            user.setAddress(updateUserRequest.getAddress());
-        }
-
-        if (updateUserRequest.getCity() != null) {
-            user.setCity(updateUserRequest.getCity());
-        }
-
-        if (updateUserRequest.getCountry() != null) {
-            user.setCountry(updateUserRequest.getCountry());
-        }
-
-        if (updateUserRequest.getPostalCode() != null) {
-            user.setPostalCode(updateUserRequest.getPostalCode());
-        }
-
-        if (updateUserRequest.getGender() != null) {
-            user.setGender(updateUserRequest.getGender());
-        }
-
+    private void updateUserDetails(User user, UpdateUserRequestDto updateUserRequest) {
+        user.setEmail(updateUserRequest.getEmail());
+        user.setName(updateUserRequest.getName());
+        user.setSurname(updateUserRequest.getSurname());
+        user.setNumber(updateUserRequest.getNumber());
+        user.setAddress(updateUserRequest.getAddress());
+        user.setCity(updateUserRequest.getCity());
+        user.setCountry(updateUserRequest.getCountry());
+        user.setPostalCode(updateUserRequest.getPostalCode());
+        user.setGender(updateUserRequest.getGender());
         if (updateUserRequest.getPassword() != null) {
             String encryptedPassword = passwordEncoder.encode(updateUserRequest.getPassword());
             user.setPassword(encryptedPassword);
         }
-
-        userRepository.save(user);
-
-        return ResponseEntity.ok(new MissatgeSimpleResponseDto("Usuario actualizado exitosamente."));
     }
 
 }

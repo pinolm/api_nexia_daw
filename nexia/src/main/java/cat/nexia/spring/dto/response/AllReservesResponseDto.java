@@ -2,7 +2,7 @@ package cat.nexia.spring.dto.response;
 
 import java.time.LocalDate;
 
-public class AllReservasResponseDto {
+public class AllReservesResponseDto {
 
     private LocalDate dia;
     private Long idReserva;
@@ -11,10 +11,10 @@ public class AllReservasResponseDto {
     private HorariDto horari;
     private UserSimpleDto user;
 
-    public AllReservasResponseDto() {
+    public AllReservesResponseDto() {
     }
 
-    public AllReservasResponseDto(LocalDate dia, Long idReserva,  PistaDto pista, HorariDto horari, UserSimpleDto user) {
+    public AllReservesResponseDto(LocalDate dia, Long idReserva, PistaDto pista, HorariDto horari, UserSimpleDto user) {
         this.dia = dia;
         this.idReserva = idReserva;
         this.horari = horari;
