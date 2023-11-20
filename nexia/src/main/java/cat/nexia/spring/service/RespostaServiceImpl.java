@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import cat.nexia.spring.models.Missatge;
 import cat.nexia.spring.models.Respuesta;
 import cat.nexia.spring.models.User;
@@ -44,6 +43,11 @@ public class RespostaServiceImpl implements RespostaService {
 
         Respuesta respuesta = new Respuesta(contenido, usuario, missatge);
         return respuestaRepository.save(respuesta);
+    }
+
+    @Override
+    public List<Respuesta> getRespuestasByMissatgeId(Long missatgeId) {
+        return respuestaRepository.findByMissatgeId(missatgeId);
     }
 
 }

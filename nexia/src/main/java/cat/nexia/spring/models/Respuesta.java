@@ -70,5 +70,5 @@ public class Respuesta implements Serializable {
     public void setContent(String content) {
         this.content = content;
     }
-    
+
 }

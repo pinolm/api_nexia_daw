@@ -8,4 +8,6 @@ public interface RespostaService {
     List<Respuesta> obtenerRespuestasPorMissatge(Long missatgeId);
 
     Respuesta crearRespuesta(Long missatgeId, Long userId, String contenido);
+
+    List<Respuesta> getRespuestasByMissatgeId(Long missatgeId);
 }
