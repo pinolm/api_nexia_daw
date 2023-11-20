@@ -61,7 +61,7 @@ public class AuthController {
   public static final String ERROR_EMAIL_IN_USE = "Error: El correu electrònic ja està en ús!";
   public static final String ERROR_ROLE_NOT_FOUND = "Error: Rol no trobat.";
 
-  public static final String SUCCESSFUL_USER_CREATION = "L'usuari s'ha creat amb èxit.";
+  public static final String SUCCESSFUL_USER_CREATION = "L'usuari amb ID %d s'ha creat amb èxit.";
   public static final String SUCCESSFUL_LOGOUT = "L'usuari ha tancat la sessió amb èxit.";
 
   /**
@@ -116,7 +116,7 @@ public class AuthController {
     user.setRoles(getRolesFromRequest(signUpRequest));
     userRepository.save(user);
 
-    return ResponseEntity.ok(new MissatgeSimpleResponseDto(SUCCESSFUL_USER_CREATION));
+    return ResponseEntity.ok(new MissatgeSimpleResponseDto(String.format(SUCCESSFUL_USER_CREATION, user.getId())));
   }
 
   /**

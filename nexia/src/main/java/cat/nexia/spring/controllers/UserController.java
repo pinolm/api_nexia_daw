@@ -192,10 +192,12 @@ public class UserController {
     @PreAuthorize(AUTHORIZATION_ROLES)
     public ResponseEntity<?> deleteUser(@PathVariable String username) {
         User user = userRepository.findByUsername(username).orElse(null);
-        userRepository.delete(user);
-
-        return user != null ? ResponseEntity.ok(new MissatgeSimpleResponseDto(SUCCESS_USER_DELETED))
-                : ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto(ERROR_USER_DELETE_NOT_FOUND));
+        if (user != null) {
+            userRepository.delete(user);
+            return ResponseEntity.ok(new MissatgeSimpleResponseDto(SUCCESS_USER_DELETED));
+        } else {
+            return ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto(ERROR_USER_DELETE_NOT_FOUND));
+        }
     }
 
     /**
@@ -218,10 +220,13 @@ public class UserController {
     @PreAuthorize(AUTHORIZATION_ROLES)
     public ResponseEntity<?> deleteById(@PathVariable Long userId) {
         User user = userRepository.findById(userId).orElse(null);
-        userRepository.delete(user);
-        return user != null ? ResponseEntity.ok(new MissatgeSimpleResponseDto(SUCCESS_USER_DELETED))
-                : ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new MissatgeSimpleResponseDto(ERROR_USER_NOT_FOUND));
+
+        if (user != null) {
+            userRepository.delete(user);
+            return ResponseEntity.ok(new MissatgeSimpleResponseDto(SUCCESS_USER_DELETED));
+        } else {
+            return ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto(ERROR_USER_DELETE_NOT_FOUND));
+        }
     }
 
     /**
