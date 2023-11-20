@@ -138,6 +138,8 @@ public class AuthController {
    * @return Rol corresponent al nom especificat.
    * @throws IllegalArgumentException Si el rol no es troba o és desconegut.
    */
+
+  // Mètode per obtenir el rol a partir del nom del rol
   private Role getRoleByName(String roleName) {
     switch (roleName.toLowerCase()) {
       case ROLE_ADMIN:
