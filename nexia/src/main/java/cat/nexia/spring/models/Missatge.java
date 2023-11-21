@@ -21,7 +21,7 @@ public class Missatge implements Serializable {
     private User user;
 
     @OneToMany(mappedBy = "missatge", cascade = CascadeType.REMOVE)
-    private List<Respuesta> respostes;
+    private List<Resposta> respostes;
 
     @Column(name = "titol_missatge")
     private String title;
@@ -60,11 +60,11 @@ public class Missatge implements Serializable {
         this.user = user;
     }
 
-    public List<Respuesta> getRespostes() {
+    public List<Resposta> getRespostes() {
         return respostes;
     }
     
-    public void setRespostes(List<Respuesta> respostes) {
+    public void setRespostes(List<Resposta> respostes) {
         this.respostes = respostes;
     }
 

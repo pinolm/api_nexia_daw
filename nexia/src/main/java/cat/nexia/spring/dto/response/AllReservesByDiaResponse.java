@@ -2,7 +2,7 @@ package cat.nexia.spring.dto.response;
 
 import java.time.LocalTime;
 
-public class AllReservasByDiaResponse {
+public class AllReservesByDiaResponse {
 
     private Long idUsuario;
     private Long idReserva;
@@ -10,7 +10,7 @@ public class AllReservasByDiaResponse {
     private LocalTime horaInicio;
     private String username;
 
-    public AllReservasByDiaResponse(Long idUsuario, Long idReserva, Long idHorario, LocalTime horaInicio, String username) {
+    public AllReservesByDiaResponse(Long idUsuario, Long idReserva, Long idHorario, LocalTime horaInicio, String username) {
         this.idUsuario = idUsuario;
         this.idReserva = idReserva;
         this.idHorario = idHorario;
