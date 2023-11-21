@@ -9,6 +9,8 @@ import cat.nexia.spring.models.Role;
 import cat.nexia.spring.models.User;
 import cat.nexia.spring.repository.RoleRepository;
 import cat.nexia.spring.repository.UserRepository;
+import cat.nexia.spring.service.UserService;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,6 +46,9 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserService userService;
 
     // Constants per als rols d'autorització i missatges d'error
     private static final String AUTHORIZATION_ROLES = "hasAnyRole('ROLE_ADMIN', 'ROLE_USER')";
@@ -363,6 +370,22 @@ public class UserController {
             String encryptedPassword = passwordEncoder.encode(updateUserRequest.getPassword());
             user.setPassword(encryptedPassword);
         }
+    }
+
+    /**
+     * Consulta l'existència d'un usuari per l'adreça electrònica.
+     *
+     * @param email L'adreça de correu electrònic de l'usuari a verificar.
+     * @return ResponseEntity amb un map que conté la clau "Existeix" i un valor
+     *         booleà que indica si el correu electrònic existeix a la base de dades.
+     */
+    @GetMapping("/findUserEmail/{email}")
+    public ResponseEntity<Map<String, Boolean>> checkEmailExists(@PathVariable String email) {
+        boolean emailExists = userService.existsByEmail(email);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("Existeix:", emailExists);
+
+        return ResponseEntity.ok(response);
     }
 
 }
