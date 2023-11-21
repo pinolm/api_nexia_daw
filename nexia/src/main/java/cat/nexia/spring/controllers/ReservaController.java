@@ -68,11 +68,8 @@ public class ReservaController {
         } else {
             LocalDate localDate = LocalDate.parse(dia, formatter);
             List<AllReservesResponseDto> reservaList = reservaService.findReservaByDia(localDate);
-            if (reservaList != null && !reservaList.isEmpty()) {
-                return new ResponseEntity<>(reservaList, HttpStatus.OK);
-            } else {
-                return buildSuccessResponse(NO_RESERVATIONS.replace("{date}", dia), HttpStatus.OK);
-            }
+            return new ResponseEntity<>(reservaList, HttpStatus.OK);
+
         }
     }
 

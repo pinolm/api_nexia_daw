@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import cat.nexia.spring.dto.request.CrearRespostaRequestDto;
 import cat.nexia.spring.dto.response.MissatgeSimpleResponseDto;
-import cat.nexia.spring.dto.response.RespuestaResponseDto;
-import cat.nexia.spring.models.Respuesta;
+import cat.nexia.spring.dto.response.RespostaResponseDto;
+import cat.nexia.spring.models.Resposta;
 import cat.nexia.spring.service.RespostaService;
 
 /**
@@ -51,7 +51,7 @@ public class RespostaController {
      */
     @PostMapping("/crear")
     public ResponseEntity<?> crearRespuesta(@RequestBody CrearRespostaRequestDto crearRespostaRequest) {
-        Respuesta novaResposta = respostaService.crearRespuesta(
+        Resposta novaResposta = respostaService.crearRespuesta(
                 crearRespostaRequest.getMissatgeId(),
                 crearRespostaRequest.getUserId(),
                 crearRespostaRequest.getContent());
@@ -72,7 +72,7 @@ public class RespostaController {
      */
     @GetMapping("/findByIdMissatge/{idMissatge}")
     public ResponseEntity<?> findByIdMissatge(@PathVariable Long idMissatge) {
-        List<Respuesta> respuestas = respostaService.obtenerRespuestasPorMissatge(idMissatge);
+        List<Resposta> respuestas = respostaService.obtenerRespuestasPorMissatge(idMissatge);
 
         if (respuestas.isEmpty()) {
             Map<String, String> response = new HashMap<>();
@@ -80,8 +80,8 @@ public class RespostaController {
             return ResponseEntity.ok(response);
         }
 
-        List<RespuestaResponseDto> respuestaDtoList = respuestas.stream()
-                .map(respuesta -> new RespuestaResponseDto(
+        List<RespostaResponseDto> respuestaDtoList = respuestas.stream()
+                .map(respuesta -> new RespostaResponseDto(
                         respuesta.getId(),
                         respuesta.getUser().getId(),
                         respuesta.getUser().getUsername(),
