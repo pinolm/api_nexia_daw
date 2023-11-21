@@ -1,9 +1,9 @@
 package cat.nexia.spring.models;
 
 import javax.persistence.*;
-
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "missatges")
@@ -19,6 +19,9 @@ public class Missatge implements Serializable {
     @ManyToOne
     @JoinColumn(name = "id_usuari", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "missatge", cascade = CascadeType.REMOVE)
+    private List<Respuesta> respostes;
 
     @Column(name = "titol_missatge")
     private String title;
@@ -55,6 +58,14 @@ public class Missatge implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<Respuesta> getRespostes() {
+        return respostes;
+    }
+    
+    public void setRespostes(List<Respuesta> respostes) {
+        this.respostes = respostes;
     }
 
     public String getTitle() {
