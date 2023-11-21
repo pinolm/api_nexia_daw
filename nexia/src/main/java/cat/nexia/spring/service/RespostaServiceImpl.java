@@ -5,21 +5,21 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import cat.nexia.spring.models.Missatge;
-import cat.nexia.spring.models.Respuesta;
+import cat.nexia.spring.models.Resposta;
 import cat.nexia.spring.models.User;
 import cat.nexia.spring.repository.MissatgeRepository;
-import cat.nexia.spring.repository.RespuestaRepository;
+import cat.nexia.spring.repository.RespostaRepository;
 import cat.nexia.spring.repository.UserRepository;
 
 @Service
 public class RespostaServiceImpl implements RespostaService {
 
-    private final RespuestaRepository respuestaRepository;
+    private final RespostaRepository respuestaRepository;
     private final UserRepository userRepository;
     private final MissatgeRepository missatgeRepository;
 
     @Autowired
-    public RespostaServiceImpl(RespuestaRepository respuestaRepository,
+    public RespostaServiceImpl(RespostaRepository respuestaRepository,
             UserRepository userRepository,
             MissatgeRepository missatgeRepository) {
         this.respuestaRepository = respuestaRepository;
@@ -28,12 +28,12 @@ public class RespostaServiceImpl implements RespostaService {
     }
 
     @Override
-    public List<Respuesta> obtenerRespuestasPorMissatge(Long missatgeId) {
+    public List<Resposta> obtenerRespuestasPorMissatge(Long missatgeId) {
         return respuestaRepository.findByMissatgeId(missatgeId);
     }
 
     @Override
-    public Respuesta crearRespuesta(Long missatgeId, Long userId, String contenido) {
+    public Resposta crearRespuesta(Long missatgeId, Long userId, String contenido) {
         Missatge missatge = missatgeRepository.findById(missatgeId).orElse(null);
         User usuario = userRepository.findById(userId).orElse(null);
 
@@ -41,12 +41,12 @@ public class RespostaServiceImpl implements RespostaService {
             return null;
         }
 
-        Respuesta respuesta = new Respuesta(contenido, usuario, missatge);
+        Resposta respuesta = new Resposta(contenido, usuario, missatge);
         return respuestaRepository.save(respuesta);
     }
 
     @Override
-    public List<Respuesta> getRespuestasByMissatgeId(Long missatgeId) {
+    public List<Resposta> getRespuestasByMissatgeId(Long missatgeId) {
         return respuestaRepository.findByMissatgeId(missatgeId);
     }
 

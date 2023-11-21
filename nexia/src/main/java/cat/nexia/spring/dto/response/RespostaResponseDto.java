@@ -1,13 +1,13 @@
 package cat.nexia.spring.dto.response;
 
-public class RespuestaResponseDto {
+public class RespostaResponseDto {
 
     private Long id;
     private Long userId;
     private String username;
     private String contenido;
 
-    public RespuestaResponseDto(Long id, Long userId, String username, String contenido) {
+    public RespostaResponseDto(Long id, Long userId, String username, String contenido) {
         this.id = id;
         this.userId = userId;
         this.username = username;

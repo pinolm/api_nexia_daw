@@ -2,7 +2,7 @@ package cat.nexia.spring.dto.request;
 
 import javax.validation.constraints.NotBlank;
 
-public class RespuestaRequestDto {
+public class RespostaRequestDto {
     
     @NotBlank
     private String content;

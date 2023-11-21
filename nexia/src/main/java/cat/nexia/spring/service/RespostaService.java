@@ -1,13 +1,13 @@
 package cat.nexia.spring.service;
 
 import java.util.List;
-import cat.nexia.spring.models.Respuesta;
+import cat.nexia.spring.models.Resposta;
 
 public interface RespostaService {
 
-    List<Respuesta> obtenerRespuestasPorMissatge(Long missatgeId);
+    List<Resposta> obtenerRespuestasPorMissatge(Long missatgeId);
 
-    Respuesta crearRespuesta(Long missatgeId, Long userId, String contenido);
+    Resposta crearRespuesta(Long missatgeId, Long userId, String contenido);
 
-    List<Respuesta> getRespuestasByMissatgeId(Long missatgeId);
+    List<Resposta> getRespuestasByMissatgeId(Long missatgeId);
 }
