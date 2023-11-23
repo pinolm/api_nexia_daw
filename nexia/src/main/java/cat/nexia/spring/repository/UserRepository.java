@@ -20,6 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   Optional<User> findUserById(Long id);
 
+
   @Modifying
   @Transactional(propagation = Propagation.REQUIRED)
   @Query(value = "update nexia.users set image=? where id = ?", nativeQuery = true)

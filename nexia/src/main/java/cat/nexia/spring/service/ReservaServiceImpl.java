@@ -1,6 +1,6 @@
 package cat.nexia.spring.service;
 
-import cat.nexia.spring.dto.response.AllReservasResponseDto;
+import cat.nexia.spring.dto.response.AllReservesResponseDto;
 import cat.nexia.spring.dto.response.HorariDto;
 import cat.nexia.spring.dto.response.PistaDto;
 import cat.nexia.spring.dto.response.UserSimpleDto;
@@ -21,7 +21,7 @@ public class ReservaServiceImpl implements ReservaService {
     private ReservaRepository reservaRepository;
 
     @Override
-    public List<AllReservasResponseDto> findReservaByDia(LocalDate dia) {
+    public List<AllReservesResponseDto> findReservaByDia(LocalDate dia) {
         if (dia != null) {
             return getAllReservasResponseDtos(reservaRepository.findReservaByDia(dia));
         } else {
@@ -30,11 +30,10 @@ public class ReservaServiceImpl implements ReservaService {
     }
 
     @Override
-    public List<AllReservasResponseDto> findAll() {
+    public List<AllReservesResponseDto> findAll() {
         List<Reserva> reservas = reservaRepository.findAllByOrderByDiaAsc();
         return getAllReservasResponseDtos(reservas);
     }
-
 
     @Override
     public Reserva findReservaById(Long idReserva) {
@@ -42,8 +41,8 @@ public class ReservaServiceImpl implements ReservaService {
     }
 
     @Override
-    public List<AllReservasResponseDto> findReservaByUserId(Long idUser) {
-        return  getAllReservasResponseDtos(reservaRepository.findReservaByIdUsuari(idUser));
+    public List<AllReservesResponseDto> findReservaByUserId(Long idUser) {
+        return getAllReservasResponseDtos(reservaRepository.findReservaByIdUsuari(idUser));
     }
 
     @Override
@@ -51,7 +50,6 @@ public class ReservaServiceImpl implements ReservaService {
         reservaRepository.insertarReserva(reserva.getIdPista(), reserva.getIdHorari(), reserva.getIdUsuari(),
                 reserva.getDia());
     }
-
 
     @Override
     public Reserva findReservaByIdPistaAndIdHorariAndDia(Reserva reserva) {
@@ -69,13 +67,12 @@ public class ReservaServiceImpl implements ReservaService {
         return reservaRepository.countReservaByUserAndDia(reserva.getIdUsuari(), reserva.getDia());
     }
 
-
-    private List<AllReservasResponseDto> getAllReservasResponseDtos(List<Reserva> reservas) {
-        List<AllReservasResponseDto> allReservasDtos = new ArrayList<>();
+    private List<AllReservesResponseDto> getAllReservasResponseDtos(List<Reserva> reservas) {
+        List<AllReservesResponseDto> allReservasDtos = new ArrayList<>();
 
         for (Reserva reserva : reservas) {
 
-            AllReservasResponseDto allReservasDto = new AllReservasResponseDto(
+            AllReservesResponseDto allReservasDto = new AllReservesResponseDto(
                     reserva.getDia(),
                     reserva.getIdReserva(),
                     new PistaDto(reserva.getPista().getNumPista()),
@@ -86,6 +83,5 @@ public class ReservaServiceImpl implements ReservaService {
         }
         return allReservasDtos;
     }
-
 
 }

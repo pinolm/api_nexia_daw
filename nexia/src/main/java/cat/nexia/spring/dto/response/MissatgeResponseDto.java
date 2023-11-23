@@ -1,18 +1,18 @@
 package cat.nexia.spring.dto.response;
 
 public class MissatgeResponseDto {
-    
+
     private Long messageId;
     private Long userId;
     private String username;
-    private String titulo;
+    private String title;
     private String content;
-    
-    public MissatgeResponseDto(Long messageId, Long userId, String username, String titulo, String content) {
+
+    public MissatgeResponseDto(Long messageId, Long userId, String username, String title, String content) {
         this.messageId = messageId;
         this.userId = userId;
         this.username = username;
-        this.titulo = titulo;
+        this.title = title;
         this.content = content;
     }
 
@@ -40,12 +40,12 @@ public class MissatgeResponseDto {
         this.username = username;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public String getTitle() {
+        return title;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getContent() {
@@ -56,5 +56,4 @@ public class MissatgeResponseDto {
         this.content = content;
     }
 
-    
 }

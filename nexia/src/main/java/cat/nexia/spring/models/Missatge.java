@@ -3,11 +3,12 @@ package cat.nexia.spring.models;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "missatges")
-public class Missatge implements Serializable{
-    
+public class Missatge implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -19,10 +20,13 @@ public class Missatge implements Serializable{
     @JoinColumn(name = "id_usuari", nullable = false)
     private User user;
 
-    @Column(name = "titol_missatge")
-    private String titulo;
+    @OneToMany(mappedBy = "missatge", cascade = CascadeType.REMOVE)
+    private List<Resposta> respostes;
 
-    @Column(name = "missatge",nullable = false)
+    @Column(name = "titol_missatge")
+    private String title;
+
+    @Column(name = "missatge", nullable = false)
     private String content;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -33,9 +37,9 @@ public class Missatge implements Serializable{
         this.createdAt = new Date();
     }
 
-    public Missatge(User user, String titulo, String content) {
+    public Missatge(User user, String title, String content) {
         this.user = user;
-        this.titulo = titulo;
+        this.title = title;
         this.content = content;
         this.createdAt = new Date();
     }
@@ -56,12 +60,20 @@ public class Missatge implements Serializable{
         this.user = user;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public List<Resposta> getRespostes() {
+        return respostes;
+    }
+    
+    public void setRespostes(List<Resposta> respostes) {
+        this.respostes = respostes;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getContent() {

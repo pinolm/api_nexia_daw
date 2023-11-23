@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "respostes")
-public class Respuesta implements Serializable {
+public class Resposta implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,10 +22,10 @@ public class Respuesta implements Serializable {
     @Column(name = "resposta",columnDefinition = "TEXT")
     private String content;
 
-    public Respuesta() {
+    public Resposta() {
     }
 
-    public Respuesta(String content, User user, Missatge missatge) {
+    public Resposta(String content, User user, Missatge missatge) {
         this.content = content;
         this.user = user;
         this.missatge = missatge;
@@ -62,5 +62,5 @@ public class Respuesta implements Serializable {
     public void setContent(String content) {
         this.content = content;
     }
-    
+
 }
