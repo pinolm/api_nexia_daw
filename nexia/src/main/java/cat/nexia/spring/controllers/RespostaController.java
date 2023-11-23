@@ -74,23 +74,23 @@ public class RespostaController {
      */
     @GetMapping("/findByIdMissatge/{idMissatge}")
     public ResponseEntity<?> findByIdMissatge(@PathVariable Long idMissatge) {
-        List<Resposta> respuestas = respostaService.obtenerRespuestasPorMissatge(idMissatge);
+        List<Resposta> respostes = respostaService.obtenerRespuestasPorMissatge(idMissatge);
 
-        if (respuestas.isEmpty()) {
+        if (respostes.isEmpty()) {
             Map<String, String> response = new HashMap<>();
             response.put("message", "No hi ha respostes associades a aquest missatge.");
             return ResponseEntity.ok(response);
         }
 
-        List<RespostaResponseDto> respuestaDtoList = respuestas.stream()
-                .map(respuesta -> new RespostaResponseDto(
-                        respuesta.getId(),
-                        respuesta.getUser().getId(),
-                        respuesta.getUser().getUsername(),
-                        respuesta.getContent()))
+        List<RespostaResponseDto> respostaDtoList = respostes.stream()
+                .map(resposta -> new RespostaResponseDto(
+                        resposta.getId(),
+                        resposta.getUser().getId(),
+                        resposta.getUser().getUsername(),
+                        resposta.getContent()))
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(respuestaDtoList);
+        return ResponseEntity.ok(respostaDtoList);
     }
 
 }

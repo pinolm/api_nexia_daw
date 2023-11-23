@@ -5,13 +5,13 @@ public class RespostaResponseDto {
     private Long id;
     private Long userId;
     private String username;
-    private String contenido;
+    private String content;
 
-    public RespostaResponseDto(Long id, Long userId, String username, String contenido) {
+    public RespostaResponseDto(Long id, Long userId, String username, String content) {
         this.id = id;
         this.userId = userId;
         this.username = username;
-        this.contenido = contenido;
+        this.content = content;
     }
 
     public Long getId() {
@@ -38,11 +38,11 @@ public class RespostaResponseDto {
         this.username = username;
     }
 
-    public String getContenido() {
-        return contenido;
+    public String getContent() {
+        return content;
     }
 
-    public void setContenido(String contenido) {
-        this.contenido = contenido;
+    public void setContent(String content) {
+        this.content = content;
     }
 }
