@@ -111,7 +111,7 @@ public class ReservaController {
         // realitzar la reserva
         int numReserves = reservaService.countReservaByDiaAndByUser(reserva);
         if (numReserves > 0) {
-            return buildErrorResponse(LIMIT_EXCEEDED, HttpStatus.OK);
+            return buildErrorResponse(LIMIT_EXCEEDED, HttpStatus.CONFLICT);
         }
 
         try {
