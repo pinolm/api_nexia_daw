@@ -71,9 +71,9 @@ public class MissatgeController {
     @GetMapping("/list")
     @PreAuthorize("permitAll()")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public ResponseEntity<List<MissatgeResponseDto>> getAllMissatges() {
+    public ResponseEntity<List<MissatgeDetailResponseDto>> getAllMissatges() {
         List<Missatge> missatges = missatgeService.getAllMissatges();
-        List<MissatgeResponseDto> responseDtoList = convertToResponseDtoList(missatges);
+        List<MissatgeDetailResponseDto> responseDtoList = convertToResponseDtoList(missatges);
         return ResponseEntity.ok(responseDtoList);
 
     }
@@ -301,9 +301,9 @@ public class MissatgeController {
      * @param missatges Llista de missatges a convertir.
      * @return Llista de DTO de resposta de missatge.
      */
-    private List<MissatgeResponseDto> convertToResponseDtoList(List<Missatge> missatges) {
+    private List<MissatgeDetailResponseDto> convertToResponseDtoList(List<Missatge> missatges) {
         return missatges.stream()
-                .map(this::convertToResponseDto)
+                .map(this::convertToDetailResponseDto)
                 .collect(Collectors.toList());
     }
 
@@ -329,11 +329,11 @@ public class MissatgeController {
      * @return DTO de resposta detallat de missatge.
      */
     private MissatgeDetailResponseDto convertToDetailResponseDto(Missatge missatge) {
-        String username = userService.getUsuariById(missatge.getUser().getId()).getUsername();
+      //  String username = userService.getUsuariById(missatge.getUser().getId()).getUsername();
         return new MissatgeDetailResponseDto(
                 missatge.getId(),
                 missatge.getUser().getId(),
-                username,
+                 missatge.getUser().getUsername(),
                 missatge.getContent(),
                 missatge.getTitle(),
                 missatge.getCreatedAt());
