@@ -1,7 +1,8 @@
 package cat.nexia.spring.service;
 
-import java.util.List;
 import cat.nexia.spring.models.Missatge;
+
+import java.util.List;
 
 public interface MissatgeService {
 

@@ -45,6 +45,8 @@ public class CreateUserRequestDto {
 
     @Size(max = 10)
     private String gender;
+
+    private byte[] image;
   
     public String getUsername() {
         return username;
@@ -141,6 +143,14 @@ public class CreateUserRequestDto {
     
     public void setRole(Set<String> role) {
       this.role = role;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 
     

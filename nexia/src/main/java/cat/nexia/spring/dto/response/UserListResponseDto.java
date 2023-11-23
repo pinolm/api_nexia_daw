@@ -1,7 +1,7 @@
 package cat.nexia.spring.dto.response;
 
 public class UserListResponseDto {
-    
+
     private Long id;
     private String username;
     private String email;
@@ -13,6 +13,9 @@ public class UserListResponseDto {
     private String gender;
     private String name;
     private String surname;
+
+    private String image;
+
 
     public UserListResponseDto(Long id, String username, String email, String number, String address, String city, String country, String postalCode, String gender, String name, String surname) {
         this.id = id;
@@ -26,6 +29,23 @@ public class UserListResponseDto {
         this.gender = gender;
         this.name = name;
         this.surname = surname;
+    }
+
+    public UserListResponseDto(Long id, String username, String email, String number, String address, String city,
+                               String country, String postalCode, String gender, String name, String surname,
+                               String image) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.number = number;
+        this.address = address;
+        this.city = city;
+        this.country = country;
+        this.postalCode = postalCode;
+        this.gender = gender;
+        this.name = name;
+        this.surname = surname;
+        this.image = image;
     }
 
     public Long getId() {
@@ -114,5 +134,13 @@ public class UserListResponseDto {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

@@ -45,6 +45,8 @@ public class RegisterRequestDto {
 
     private Set<String> role;
 
+    private byte[] image;
+
     public String getUsername() {
         return username;
     }
@@ -139,5 +141,13 @@ public class RegisterRequestDto {
 
     public void setRole(Set<String> role) {
         this.role = role;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 }

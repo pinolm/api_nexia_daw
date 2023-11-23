@@ -1,16 +1,15 @@
 package cat.nexia.spring.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cat.nexia.spring.models.Missatge;
 import cat.nexia.spring.models.Respuesta;
 import cat.nexia.spring.models.User;
 import cat.nexia.spring.repository.MissatgeRepository;
 import cat.nexia.spring.repository.RespuestaRepository;
 import cat.nexia.spring.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class RespuestaServiceImpl implements RespuestaService{

@@ -3,6 +3,7 @@ package cat.nexia.spring.controllers;
 import cat.nexia.spring.dto.request.CreateUserRequestDto;
 import cat.nexia.spring.dto.request.UpdateUserRequestDto;
 import cat.nexia.spring.dto.response.MissatgeSimpleResponseDto;
+import cat.nexia.spring.dto.response.ResponseMessage;
 import cat.nexia.spring.dto.response.UserListResponseDto;
 import cat.nexia.spring.models.ERole;
 import cat.nexia.spring.models.Role;
@@ -18,11 +19,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -78,7 +78,8 @@ public class UserController {
                             user.getPostalCode(),
                             user.getGender(),
                             user.getName(),
-                            user.getSurname()))
+                            user.getSurname(),
+                            user.getImage()))
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(userResponses);
@@ -130,7 +131,13 @@ public class UserController {
                 user.getPostalCode(),
                 user.getGender(),
                 user.getName(),
-                user.getSurname());
+                user.getSurname(),
+                user.getImage())
+        ;
+
+
+
+
 
         return ResponseEntity.ok(response);
     }
@@ -171,7 +178,8 @@ public class UserController {
                     user.getPostalCode(),
                     user.getGender(),
                     user.getName(),
-                    user.getSurname());
+                    user.getSurname(),
+                    user.getImage());
 
             return ResponseEntity.ok(response);
         } else {
@@ -339,7 +347,7 @@ public class UserController {
     @PutMapping("/update/{userId}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<?> updateUser(@PathVariable Long userId,
-            @RequestBody UpdateUserRequestDto updateUserRequest) {
+            @RequestBody UpdateUserRequestDto updateUserRequest)  {
 
         User user = userRepository.findById(userId).orElse(null);
 
@@ -389,10 +397,41 @@ public class UserController {
             String encryptedPassword = passwordEncoder.encode(updateUserRequest.getPassword());
             user.setPassword(encryptedPassword);
         }
+        if (updateUserRequest.getImage() != null){
+            String file = updateUserRequest.getImage();
+            if (!file.isEmpty()){
+                user.setImage(file);
+            }
+        }
 
         userRepository.save(user);
 
         return ResponseEntity.ok(new MissatgeSimpleResponseDto("Usuario actualizado exitosamente."));
     }
+
+    @PostMapping("/uploadImage")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file,
+                                                      @RequestParam("userId") String userId ) {
+        String message = "";
+        try {
+            if (!file.isEmpty()){
+                String capcalera = "data:image;base64,";
+                String encodedString = capcalera.concat(Base64.getEncoder().encodeToString(file.getBytes()));
+                userRepository.updateUserById( encodedString, Long.parseLong(userId));
+            } else {
+                message = "Uploaded the file is empty: " + file.getOriginalFilename();
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
+            }
+
+            message = "Uploaded the file successfully: " + file.getOriginalFilename();
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+        } catch (Exception e) {
+            message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
+        }
+    }
+
+
 
 }

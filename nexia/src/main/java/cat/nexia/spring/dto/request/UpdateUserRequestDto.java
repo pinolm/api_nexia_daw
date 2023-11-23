@@ -25,6 +25,8 @@ public class UpdateUserRequestDto {
     @Size(max = 50)
     private String email;
 
+    private String image;
+
     public String getName() {
         return name;
     }
@@ -103,6 +105,14 @@ public class UpdateUserRequestDto {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
 }

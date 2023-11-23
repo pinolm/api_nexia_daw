@@ -1,15 +1,15 @@
 package cat.nexia.spring.controllers;
 
+import cat.nexia.spring.dto.request.CrearRespuestaRequestDto;
+import cat.nexia.spring.dto.response.MissatgeSimpleResponseDto;
+import cat.nexia.spring.models.Respuesta;
+import cat.nexia.spring.service.RespuestaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import cat.nexia.spring.dto.request.CrearRespuestaRequestDto;
-import cat.nexia.spring.dto.response.MissatgeSimpleResponseDto;
-import cat.nexia.spring.models.Respuesta;
-import cat.nexia.spring.service.RespuestaService;
 
 @RestController
 @RequestMapping("/api/respuesta")

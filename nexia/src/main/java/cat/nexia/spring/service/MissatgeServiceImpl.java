@@ -1,12 +1,11 @@
 package cat.nexia.spring.service;
 
-import java.util.List;
-
+import cat.nexia.spring.models.Missatge;
+import cat.nexia.spring.repository.MissatgeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cat.nexia.spring.models.Missatge;
-import cat.nexia.spring.repository.MissatgeRepository;
+import java.util.List;
 
 @Service
 public class MissatgeServiceImpl implements MissatgeService {

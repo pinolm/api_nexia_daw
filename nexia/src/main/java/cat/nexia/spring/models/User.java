@@ -61,6 +61,9 @@ public class User implements Serializable {
   @Size(max = 10)
   private String gender;
 
+  @Column(name = "image")
+  private String image;
+
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "user_roles", 
              joinColumns = @JoinColumn(name = "user_id"),
@@ -77,6 +80,13 @@ public class User implements Serializable {
     this.username = username;
     this.email = email;
     this.password = password;
+  }
+
+  public User(String username, String email, String password, String image) {
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.image = image;
   }
 
   public Long getId() {
@@ -189,5 +199,13 @@ public class User implements Serializable {
 
   public void setReservas(List<Reserva> reservas) {
     this.reservas = reservas;
+  }
+
+  public String getImage() {
+    return image;
+  }
+
+  public void setImage(String image) {
+    this.image = image;
   }
 }
