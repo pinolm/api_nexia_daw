@@ -8,6 +8,7 @@ import cat.nexia.spring.models.Reserva;
 import cat.nexia.spring.models.mapper.AllReservaMapper;
 import cat.nexia.spring.models.mapper.ReservaMapper;
 import cat.nexia.spring.service.ReservaService;
+import cat.nexia.spring.service.UserService;
 import cat.nexia.spring.utils.NexiaEnum;
 import cat.nexia.spring.utils.NexiaUtils;
 import org.apache.commons.validator.GenericValidator;
@@ -21,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Controlador que gestiona les operacions relacionades amb les reserves.
@@ -32,6 +34,9 @@ public class ReservaController {
 
     @Autowired
     private ReservaService reservaService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private SendMail sendMail;
@@ -48,6 +53,8 @@ public class ReservaController {
             "Només es pot realitzar una reserva per dia";
     private static final String USER_HAS_NO_RESERVATIONS = "L'usuari: {userId} no té reserves";
     private static final String ERROR_GETTING_RESERVA = "Error al recuperar la reserva";
+
+    private static final Integer ROLE_ADMIN = 3;
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern(NexiaEnum.DATA_TIME_FORMAT.getPhrase());
 
@@ -107,13 +114,24 @@ public class ReservaController {
      */
     @PostMapping("/createReserva")
     public ResponseEntity<Object> createReserva(@RequestBody Reserva reserva) {
-        // comprovar si l'usuari té més d'una reserva per dia, si és així, no pot
-        // realitzar la reserva
-        int numReserves = reservaService.countReservaByDiaAndByUser(reserva);
-        if (numReserves > 0) {
-            return buildErrorResponse(LIMIT_EXCEEDED, HttpStatus.OK);
-        }
 
+        //comprobar si l'usuari té el rol ADMIN
+        List<Integer> rolesUser = userService.findRolesByUserId(reserva.getIdUsuari());
+        boolean isUserAdmin = false;
+        for (Integer role: rolesUser) {
+            if (Objects.equals(role, ROLE_ADMIN)){
+                isUserAdmin = true;
+                break;
+            }
+        }
+        // comprovar si l'usuari amb rol USER, MODERATOR té més d'una reserva per dia, si és així, no pot
+        // realitzar la reserva
+        if (!isUserAdmin) {
+            int numReserves = reservaService.countReservaByDiaAndByUser(reserva);
+            if (numReserves > 0) {
+                return buildErrorResponse(LIMIT_EXCEEDED, HttpStatus.OK);
+            }
+        }
         try {
             reservaService.guardarReserva(reserva);
             Reserva guardada = reservaService.findReservaByIdPistaAndIdHorariAndDia(reserva);

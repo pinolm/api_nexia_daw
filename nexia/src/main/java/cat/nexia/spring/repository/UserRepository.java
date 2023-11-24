@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,6 +20,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
   Boolean existsByEmail(String email);
 
   Optional<User> findUserById(Long id);
+
+  @Query(value = "select ur.role_id from nexia.users\n" +
+          "left join nexia.user_roles ur on users.id = ur.user_id\n" +
+          "where users.id = ?;", nativeQuery = true)
+  List<Integer> findUserRolByUserId(Long id);
 
 
   @Modifying
