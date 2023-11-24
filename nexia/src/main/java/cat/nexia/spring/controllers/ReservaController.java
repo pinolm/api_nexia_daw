@@ -41,9 +41,8 @@ public class ReservaController {
     @Autowired
     private SendMail sendMail;
 
-    public static final String EMAIL = ""; // *****************************************************
-    private static final String EMAIL_RESERVA_SUCCESS_SUBJECT = "Nexia Pàdel: RESERVA";
-    private static final String EMAIL_DELETE_SUBJECT = "TEST"; // *****************************************************
+    private static final String EMAIL_RESERVA_SUCCESS_SUBJECT = "Nexia Pàdel: RESERVA CONFIRMADA";
+    private static final String EMAIL_DELETE_SUBJECT = "Nexia Pàdel: RESERVA CANCEL·LADA";
 
     private static final String DATE_PATTERN = "yyyy-MM-dd";
     private static final String DATE_PATTERN_ERROR = "PATRÓ DE DATA INCORRECTE: {date}\r" +
@@ -137,7 +136,7 @@ public class ReservaController {
             Reserva guardada = reservaService.findReservaByIdPistaAndIdHorariAndDia(reserva);
             if (reserva != null) {
                 // SI GUARDA, ENVIAR EMAIL AMB CONFIRMACIÓ. Cos de l'email millorat per Laura GC
-                String cosEmail = StringMails.cosEmailReservaMillorat(guardada);
+                String cosEmail = StringMails.cosEmailReservaConfirmada(guardada);
                 sendMail.sendEmailHtml(guardada.getUser().getEmail(), null, null, EMAIL_RESERVA_SUCCESS_SUBJECT,
                         cosEmail);
                 ReservaDto reservaDto = ReservaMapper.toReservaDto(guardada);
@@ -212,11 +211,16 @@ public class ReservaController {
         try {
             Reserva reserva = reservaService.findReservaById(idReserva);
             ReservaDto reservaDto = ReservaMapper.toReservaDto(reserva);
+            Reserva guardada = reservaService.findReservaByIdPistaAndIdHorariAndDia(reserva);
+
             if (reservaDto != null) {
                 reservaDto.setInfo(NexiaEnum.RESERVA_DELETE_INFO.getPhrase());
                 reservaService.eliminarReservaById(idReserva);
                 // SI ELIMINA, ENVIAR EMAIL AMB CONFIRMACIÓ
-                sendMail.sendEmailHtml(EMAIL, null, null, EMAIL_DELETE_SUBJECT, StringMails.mailReserva);
+                String cosEmail = StringMails.cosEmailReservaCancelada(guardada);
+
+                sendMail.sendEmailHtml(guardada.getUser().getEmail(), null, null, EMAIL_DELETE_SUBJECT,
+                        cosEmail);
                 return new ResponseEntity<>(reservaDto, HttpStatus.OK);
             } else {
                 return buildErrorResponse(NexiaEnum.ID_ERROR.getPhrase() + idReserva, HttpStatus.INTERNAL_SERVER_ERROR);
