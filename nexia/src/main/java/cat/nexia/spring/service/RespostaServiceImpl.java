@@ -1,6 +1,5 @@
 package cat.nexia.spring.service;
 
-
 import cat.nexia.spring.models.Missatge;
 import cat.nexia.spring.models.Resposta;
 import cat.nexia.spring.models.User;
@@ -34,16 +33,22 @@ public class RespostaServiceImpl implements RespostaService {
     }
 
     @Override
-    public Resposta crearRespuesta(Long missatgeId, Long userId, String contenido) {
+    public Resposta crearResposta(Long missatgeId, Long userId, String content) {
         Missatge missatge = missatgeRepository.findById(missatgeId).orElse(null);
         User usuario = userRepository.findById(userId).orElse(null);
 
-        if (missatge == null || usuario == null) {
-            return null;
-        }
+        if (missatge == null) {
+            System.out.println("El missatge no s'ha trobat");
 
-        Resposta respuesta = new Resposta(contenido, usuario, missatge);
-        return respuestaRepository.save(respuesta);
+        } else if (usuario == null) {
+            System.out.println("L'usuari no s'ha trobat");
+
+        } else {
+            Resposta respuesta = new Resposta(content, usuario, missatge);
+            return respuestaRepository.save(respuesta);
+        }
+        return null;
+
     }
 
     @Override

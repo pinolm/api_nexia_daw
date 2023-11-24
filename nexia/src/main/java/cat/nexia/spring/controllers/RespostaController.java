@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,16 +54,24 @@ public class RespostaController {
      */
     @PostMapping("/crear")
     public ResponseEntity<?> crearRespuesta(@RequestBody CrearRespostaRequestDto crearRespostaRequest) {
-        Resposta novaResposta = respostaService.crearRespuesta(
-                crearRespostaRequest.getMissatgeId(),
-                crearRespostaRequest.getUserId(),
-                crearRespostaRequest.getContent());
+        try {
+            Resposta novaResposta = respostaService.crearResposta(
+                    crearRespostaRequest.getMissatgeId(),
+                    crearRespostaRequest.getUserId(),
+                    crearRespostaRequest.getContent());
 
-        if (novaResposta == null) {
-            return ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto(ERROR_CREATE_RESPONSE));
+            if (novaResposta == null) {
+                return ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto(ERROR_CREATE_RESPONSE));
+            }
+
+            return ResponseEntity.ok(new MissatgeSimpleResponseDto(RESPONSE_CREATED_SUCCESSFULLY));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+
+                    .body(new MissatgeSimpleResponseDto(
+                            "S'ha produït un error desconegut. Detalls: " + e.getMessage()));
         }
 
-        return ResponseEntity.ok(new MissatgeSimpleResponseDto(RESPONSE_CREATED_SUCCESSFULLY));
     }
 
     /**

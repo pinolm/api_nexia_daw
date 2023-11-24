@@ -5,7 +5,6 @@ import javax.validation.constraints.NotBlank;
 public class CrearRespostaRequestDto {
 
     private Long missatgeId;
-
     private Long userId;
 
     @NotBlank
