@@ -76,7 +76,7 @@ public class UserController {
      * un missatge d'error en cas de permisos insuficients.
      */
     @GetMapping("/list")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize(AUTHORIZATION_ROLES)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public ResponseEntity<?> userList() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -128,7 +128,7 @@ public class UserController {
      * d'error si no es troba.
      */
     @GetMapping("/findById/{userId}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize(AUTHORIZATION_ROLES)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public ResponseEntity<?> findUserById(@PathVariable Long userId) {
         User user = userRepository.findById(userId).orElse(null);
@@ -171,7 +171,7 @@ public class UserController {
      *         per accedir a aquesta informació.
      */
     @GetMapping("/findByUsername/{username}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize(AUTHORIZATION_ROLES)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public ResponseEntity<?> findUserByUsername(@PathVariable String username) {
 
@@ -221,7 +221,7 @@ public class UserController {
      * correctament o si hi ha hagut un error.
      */
     @PostMapping("/create")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize(AUTHORIZATION_ROLES)
     public ResponseEntity<?> createUser(@RequestBody CreateUserRequestDto createUserRequest,
             UriComponentsBuilder ucBuilder) {
         if (userRepository.existsByUsername(createUserRequest.getUsername())) {
@@ -236,7 +236,7 @@ public class UserController {
                     .body(new MissatgeSimpleResponseDto(ERROR_EMAIL_IN_USE));
         }
 
-        User user = new User(createUserRequest.getUsername(), createUserRequest.getEmail(),
+        User user = new User(createUserRequest.getUsername().toLowerCase(), createUserRequest.getEmail(),
                 passwordEncoder.encode(createUserRequest.getPassword()));
 
         user.setNumber(createUserRequest.getNumber());
@@ -286,7 +286,7 @@ public class UserController {
      * correctament o si hi ha hagut un error.
      */
     @DeleteMapping("/deleteByUsername/{username}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize(AUTHORIZATION_ROLES)
     public ResponseEntity<?> deleteUser(@PathVariable String username) {
 
         User user = userRepository.findByUsername(username).orElse(null);
@@ -316,7 +316,7 @@ public class UserController {
      * correctament o si hi ha hagut un error.
      */
     @DeleteMapping("/deleteById/{userId}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize(AUTHORIZATION_ROLES)
     public ResponseEntity<?> deleteById(@PathVariable Long userId) {
 
         User user = userRepository.findById(userId).orElse(null);
@@ -349,7 +349,7 @@ public class UserController {
      * correctament o si ha ocorregut un error.
      */
     @PutMapping("/update/{userId}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize(AUTHORIZATION_ROLES)
     public ResponseEntity<?> updateUser(@PathVariable Long userId,
             @RequestBody UpdateUserRequestDto updateUserRequest)  {
 
@@ -438,7 +438,7 @@ public class UserController {
      */
 
     @PostMapping("/uploadImage")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize(AUTHORIZATION_ROLES)
     public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file,
                                                       @RequestParam("userId") String userId ) {
         String message = "";
