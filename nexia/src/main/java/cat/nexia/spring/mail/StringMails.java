@@ -46,6 +46,14 @@ public class StringMails {
                         "            padding: 50px 50px 250px 50px;" +
                         "        }" +
                         "" +
+                        "        .contrasenya {"+
+                        "            background-image: url(https://mcusercontent.com/db03ab86cca73f5e687380379/images/ffb11fef-9b5f-1c75-cbc5-39964bc52172.jpg);"+
+                        "        }"+
+                        ""+
+                        "        .benvinguda {"+
+                        "            background-image: url(https://mcusercontent.com/db03ab86cca73f5e687380379/images/28033639-89e1-4368-af46-85a37537785d.jpg);"+
+                        "        }"+
+                        "" +
                         "        @media only screen and (min-width: 768px) {" +
                         "            .cos-missatge {" +
                         "                padding-bottom: 200px;" +
@@ -69,15 +77,32 @@ public class StringMails {
                         "            padding-bottom: 10px;" +
                         "            font-family: 'Work Sans', 'Lora', Georgia, 'Times New Roman', serif;" +
                         "        }" +
-                        "" +
-                        "        .cos-missatge p," +
-                        "        .cos-missatge strong {" +
-                        "            position: relative;" +
-                        "            font-size: 20px;" +
-                        "            font-family: 'Lora', Georgia, 'Times New Roman', serif;" +
-                        "        }" +
-                        "" +
-                        "" +
+                        ""+
+                        "        .cos-missatge p,"+
+                        "        .cos-missatge strong ,"+
+                        "        .cos-missatge .btn {"+
+                        "            position:relative;"+
+                        "            font-size: 20px;"+
+                        "            font-family: 'Lora', Georgia, 'Times New Roman', serif;"+
+                        "        }"+
+                        ""+
+                        "        .cos-missatge .btn {"+
+                        "            display: block;"+
+                        "            text-decoration: none;"+
+                        "            border-radius: 4px;"+
+                        "            border-style: solid;"+
+                        "            border-width: 2px;"+
+                        "            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);"+
+                        "            background: #C1D96A;"+
+                        "            padding: 16px 20px;"+
+                        "            margin: 20px 0;"+
+                        "            border-color: #C1D96A;"+
+                        "            color: #121212;"+
+                        "            width: 220px;"+
+                        "            text-align: center;"+
+                        "        }"+
+                        ""+
+                        ""+
                         "        .footer {" +
                         "            padding: 30px;" +
                         "            margin: 0 auto;" +
@@ -121,7 +146,16 @@ public class StringMails {
                         "        }" +
                         "" +
                         "    </style>" +
-                        "</head>";
+                        "</head>" +
+                        "" +
+                                "<body>" +
+                                "<div id=\"body\">" +
+                                "    <div class=\"fons-degradat\">" +
+                                "        <div class=\"header\">" +
+                                "            <img src=\"https://mcusercontent.com/db03ab86cca73f5e687380379/images/67a816ef-101e-9b4d-125d-6d76888bc7b7.png\" alt=\"logo-nexia\" width=\"150\">"
+                                +
+                                "        </div>" +
+                                "    </div>";
 
         public static final String FOOTER = "    <div class=\"fons-degradat\">" +
                         "        <div class=\"footer\">" +
@@ -147,15 +181,7 @@ public class StringMails {
 
         public static String cosEmailReservaConfirmada(Reserva rsv) {
                 return HEADER +
-                                "" +
-                                "<body>" +
-                                "<div id=\"body\">" +
-                                "    <div class=\"fons-degradat\">" +
-                                "        <div class=\"header\">" +
-                                "            <img src=\"https://mcusercontent.com/db03ab86cca73f5e687380379/images/67a816ef-101e-9b4d-125d-6d76888bc7b7.png\" alt=\"logo-nexia\" width=\"150\">"
-                                +
-                                "        </div>" +
-                                "    </div>" +
+                                
                                 "    <div class=\"cos-missatge\">" +
                                 "        <h1>GRÀCIES PER UTILITZAR NEXIA</h1>" +
                                 "        <p><strong>La teva reserva es la següent:</strong></p>" +
@@ -169,14 +195,6 @@ public class StringMails {
 
         public static String cosEmailReservaCancelada(Reserva rsv) {
                 return HEADER +
-                                "<body>" +
-                                "<div id=\"body\">" +
-                                "    <div class=\"fons-degradat\">" +
-                                "        <div class=\"header\">" +
-                                "            <img src=\"https://mcusercontent.com/db03ab86cca73f5e687380379/images/67a816ef-101e-9b4d-125d-6d76888bc7b7.png\" alt=\"logo-nexia\" width=\"150\">"
-                                +
-                                "        </div>" +
-                                "    </div>" +
                                 "    <div class=\"cos-missatge\">" +
                                 "        <h1>GRÀCIES PER UTILITZAR NEXIA</h1>" +
                                 "        <p><strong>S'ha cancel·lat la teva reserva amb les següents dades:</strong></p>"
@@ -189,4 +207,28 @@ public class StringMails {
                                 + FOOTER;
         }
 
+        public static final String cosEmailContrasenya(long userId) {
+                                return HEADER +
+                                "        <div class=\"cos-missatge contrasenya\">"+
+                                "            <p><strong>Hola:</strong></p>"+
+                                "            <p>T'enviem aquest correu perquè vas fer una sol·licitud de recuperació de contrasenya.</p>"+
+                                "            <a class=\"btn\" href=\"http://localhost:4200/canvi-contrasenya/"+userId+" class=\"button\">Recuperar contrasenya</a>"+
+                                "            <p class=\"ultim\">Si no has realitzat aquesta sol·licitud, pots ignorar aquest email.</p>"+
+                                "        </div>"
+                                + FOOTER;
+        }    
+
+                public static final String cosEmailBenvinguda(long userId, String username) {
+                                return HEADER +
+                                "<div class=\"cos-missatge benvinguda\">"+
+                                "    <h1>BENVINGUT A NEXIA</h1>"+
+                                "    <p>Et donem la benvinguda a la nostra comunitat!</p>"+
+                                "    <p>Aquestes son les teves dades per iniciar sessió:</p>"+
+                                "    <p>Usuari: "+ username +"</p>"+
+                                "    <p>Contrasenya: 12345678</p>"+
+                                "    <p class=\"ultim\">Aquesta contrasenya és generica, per aquesta raò et recomanem canviar-la abans de començar a utilitzar el servei.</p>"+
+                                "    <a class=\"btn\" href=\"http://localhost:4200/canvi-contrasenya/"+ userId + " class=\"button\">Canviar contrasenya</a>"+
+                                "</div>"
+                                + FOOTER;
+        }  
 }
