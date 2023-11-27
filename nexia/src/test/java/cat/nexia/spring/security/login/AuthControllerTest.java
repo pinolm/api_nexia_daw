@@ -3,6 +3,7 @@ package cat.nexia.spring.security.login;
 import cat.nexia.spring.SpringBootNexiaApplication;
 import cat.nexia.spring.controllers.AuthController;
 import cat.nexia.spring.dto.request.LoginRequestDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 //TEST PROVA TEA3
 @SpringBootTest(classes = SpringBootNexiaApplication.class)

@@ -1,9 +1,9 @@
 package cat.nexia.spring.repository;
 
-import java.util.List;
-
-import org.springframework.data.jpa.repository.JpaRepository;
 import cat.nexia.spring.models.Resposta;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 public interface RespostaRepository extends JpaRepository<Resposta, Long>{
     

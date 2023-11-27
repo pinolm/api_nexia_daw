@@ -30,6 +30,11 @@ public class Reserva implements Serializable  {
     @Column(name = "dia")
     private LocalDate dia;
 
+    @Column(name = "id_tipus_reserva")
+    private Long idTipusReserva;
+
+
+
 
     @ManyToOne
     @JoinColumn(name = "id_pista", insertable = false, updatable = false)
@@ -42,6 +47,11 @@ public class Reserva implements Serializable  {
     @ManyToOne
     @JoinColumn(name = "id_usuari", insertable = false, updatable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "id_tipus_reserva", insertable = false, updatable = false)
+    private ReservaTipus reservaTipus;
+
 
 
     public Reserva() {
@@ -59,6 +69,14 @@ public class Reserva implements Serializable  {
         this.idPista = idPista;
         this.idHorari = idHora;
         this.idUsuari = idUsuari;
+    }
+
+    public Reserva(Long idPista, Long idHorari, Long idUsuari, LocalDate dia, Long idTipusReserva) {
+        this.idPista = idPista;
+        this.idHorari = idHorari;
+        this.idUsuari = idUsuari;
+        this.dia = dia;
+        this.idTipusReserva = idTipusReserva;
     }
 
     public Long getIdReserva() {
@@ -99,6 +117,22 @@ public class Reserva implements Serializable  {
 
     public void setDia(LocalDate dia) {
         this.dia = dia;
+    }
+
+    public Long getIdTipusReserva() {
+        return idTipusReserva;
+    }
+
+    public void setIdTipusReserva(Long idTipusReserva) {
+        this.idTipusReserva = idTipusReserva;
+    }
+
+    public ReservaTipus getReservaTipus() {
+        return reservaTipus;
+    }
+
+    public void setReservaTipus(ReservaTipus reservaTipus) {
+        this.reservaTipus = reservaTipus;
     }
 
     public Pista getPista() {

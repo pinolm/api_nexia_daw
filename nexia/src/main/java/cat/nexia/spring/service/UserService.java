@@ -2,7 +2,6 @@ package cat.nexia.spring.service;
 
 import cat.nexia.spring.models.User;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
 
 public interface UserService {

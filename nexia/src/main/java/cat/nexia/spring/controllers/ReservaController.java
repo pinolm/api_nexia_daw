@@ -99,30 +99,22 @@ public class ReservaController {
     }
 
     /**
-     * Cerca totes les reserves.
+     * Crea una reserva.
      *
      * @param reserva informació com a:
      *                "idPista": 2,
      *                "idHorari": 6,
      *                "idUsuari": 5,
      *                "dia": "2023-11-01"
-     * @return Una resposta que conté la informació de la reserva si es troba
+     * @return Una resposta que conté la informació de la reserva
      * @exception Exception: si l'excepció és de tipus PSQLException, retorna:
      *                       ERROR: clau duplicada
      *                       viola la restricció d'unicitat «reserva_unique»
      */
     @PostMapping("/createReserva")
     public ResponseEntity<Object> createReserva(@RequestBody Reserva reserva) {
-
         //comprobar si l'usuari té el rol ADMIN
-        List<Integer> rolesUser = userService.findRolesByUserId(reserva.getIdUsuari());
-        boolean isUserAdmin = false;
-        for (Integer role: rolesUser) {
-            if (Objects.equals(role, ROLE_ADMIN)){
-                isUserAdmin = true;
-                break;
-            }
-        }
+        boolean isUserAdmin = isUserAdmin(reserva);
         // comprovar si l'usuari amb rol USER, MODERATOR té més d'una reserva per dia, si és així, no pot
         // realitzar la reserva
         if (!isUserAdmin) {
@@ -151,7 +143,7 @@ public class ReservaController {
     }
 
     /**
-     * Cerca una reserva per dia.
+     * Cerca una reserva per id.
      *
      * @param idReserva L'ID de la reserva a cercar.
      * @return Una resposta que conté la informació de la reserva si es troba,
@@ -289,4 +281,17 @@ public class ReservaController {
         return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+
+    private boolean isUserAdmin(Reserva reserva) {
+        //comprobar si l'usuari té el rol ADMIN
+        List<Integer> rolesUser = userService.findRolesByUserId(reserva.getIdUsuari());
+        boolean isUserAdmin = false;
+        for (Integer role: rolesUser) {
+            if (Objects.equals(role, ROLE_ADMIN)){
+                isUserAdmin = true;
+                break;
+            }
+        }
+        return isUserAdmin;
+    }
 }
