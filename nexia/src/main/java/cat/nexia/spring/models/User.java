@@ -73,6 +73,9 @@ public class User implements Serializable {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   private List<Reserva> reservas;
 
+  @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+  private List<Missatge> missatges;
+
   public User() {
   }
 
