@@ -329,15 +329,16 @@ public class MissatgeController {
      * @return DTO de resposta detallat de missatge.
      */
     private MissatgeDetailResponseDto convertToDetailResponseDto(Missatge missatge) {
-        // String username =
-        // userService.getUsuariById(missatge.getUser().getId()).getUsername();
+        int numRespostes = missatge.getRespostes().size();
+    
         return new MissatgeDetailResponseDto(
                 missatge.getId(),
                 missatge.getUser().getId(),
                 missatge.getUser().getUsername(),
                 missatge.getTitle(),
                 missatge.getContent(),
-                missatge.getCreatedAt());
+                missatge.getCreatedAt(),
+                numRespostes);
     }
 
     /**

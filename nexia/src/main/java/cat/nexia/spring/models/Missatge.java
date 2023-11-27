@@ -33,6 +33,9 @@ public class Missatge implements Serializable {
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
 
+    @Column(name = "estat", nullable = false)
+    private boolean estat;
+
     public Missatge() {
         this.createdAt = new Date();
     }
@@ -42,6 +45,7 @@ public class Missatge implements Serializable {
         this.title = title;
         this.content = content;
         this.createdAt = new Date();
+        this.estat = true;
     }
 
     public Long getId() {
@@ -90,6 +94,14 @@ public class Missatge implements Serializable {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isEstat() {
+        return estat;
+    }
+
+    public void setEstat(boolean estat) {
+        this.estat = estat;
     }
 
 }

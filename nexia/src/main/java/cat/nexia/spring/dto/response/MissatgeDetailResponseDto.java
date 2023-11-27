@@ -10,15 +10,16 @@ public class MissatgeDetailResponseDto {
     private String title;
     private String content;
     private Date createdAt;
-    
+    private int numRespostes;
 
-    public MissatgeDetailResponseDto(Long messageId, Long userId, String username, String title, String content, Date createdAt) {
+    public MissatgeDetailResponseDto(Long messageId, Long userId, String username, String title, String content, Date createdAt, int numRespostes) {
         this.messageId = messageId;
         this.userId = userId;
         this.username = username;
         this.title = title;
         this.content = content;
         this.createdAt = createdAt;
+        this.numRespostes = numRespostes;
     }
 
     public Long getMessageId() {
@@ -67,5 +68,13 @@ public class MissatgeDetailResponseDto {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public int getRespuestaCount() {
+        return numRespostes;
+    }
+
+    public void setRespuestaCount(int numRespostes) {
+        this.numRespostes = numRespostes;
     }
 }
