@@ -216,6 +216,53 @@ public class MissatgeController {
     }
 
     /**
+     * Actualitza l'estat d'un missatge identificat pel vostre ID.
+     *
+     * Si el missatge es troba i s'actualitza correctament, es torna una resposta
+     * amb èxit amb un missatge indicant que l'estat del missatge s'ha actualitzat
+     * amb èxit.
+     * Si no es troba el missatge amb l'ID proporcionat, es torna una resposta 404
+     * (No trobat) amb un missatge d'error.
+     * Si el paràmetre 'estat' no és present al cos de la sol·licitud,
+     * es torna una resposta 400 (Sol·licitud incorrecta) amb un missatge d'error.
+     *
+     * @param id       L'ID del missatge a actualitzar.
+     * @param estatMap Mapa que conté el nou estat del missatge sota la clau
+     *                 'estat'.
+     * @return ResponseEntity amb un map que conté un missatge d'èxit si l'estat
+     *         del missatge s'actualitza correctament, o un missatge d'error si no
+     *         es troba el missatge o hi ha problemes
+     *         a la sol·licitud.
+     */
+    @PutMapping("/updateEstat/{id}")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public ResponseEntity<Map<String, String>> updateEstat(@PathVariable Long id,
+            @RequestBody Map<String, Boolean> estatMap) {
+
+        if (estatMap.containsKey("estat")) {
+            Boolean estat = estatMap.get("estat");
+
+            Missatge missatge = missatgeService.getMissatgeById(id);
+
+            if (missatge != null) {
+
+                missatge.setEstat(estat);
+                missatgeService.createMissatge(missatge);
+
+                return buildSuccessResponse(
+                        String.format("L'estat del missatge amb ID %d s'ha actualitzat correctament.", id),
+                        HttpStatus.OK);
+            } else {
+                return buildErrorResponse(ERROR_MESSAGE_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return buildErrorResponse("El paràmetre 'estat' és requerit al cos de la sol·licitud.",
+                    HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    /**
      * Obté l'usuari actual a partir de l'objecte Authentication.
      *
      * @param authentication Objecte Authentication que representa la informació
@@ -330,7 +377,8 @@ public class MissatgeController {
      */
     private MissatgeDetailResponseDto convertToDetailResponseDto(Missatge missatge) {
         int numRespostes = missatge.getRespostes().size();
-    
+        boolean estat = missatge.isEstat();
+
         return new MissatgeDetailResponseDto(
                 missatge.getId(),
                 missatge.getUser().getId(),
@@ -338,7 +386,8 @@ public class MissatgeController {
                 missatge.getTitle(),
                 missatge.getContent(),
                 missatge.getCreatedAt(),
-                numRespostes);
+                numRespostes,
+                estat);
     }
 
     /**

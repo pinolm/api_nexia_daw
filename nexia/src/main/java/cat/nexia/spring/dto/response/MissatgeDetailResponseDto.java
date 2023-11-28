@@ -11,8 +11,9 @@ public class MissatgeDetailResponseDto {
     private String content;
     private Date createdAt;
     private int numRespostes;
+    private boolean estat;
 
-    public MissatgeDetailResponseDto(Long messageId, Long userId, String username, String title, String content, Date createdAt, int numRespostes) {
+    public MissatgeDetailResponseDto(Long messageId, Long userId, String username, String title, String content, Date createdAt, int numRespostes, boolean estat) {
         this.messageId = messageId;
         this.userId = userId;
         this.username = username;
@@ -20,6 +21,7 @@ public class MissatgeDetailResponseDto {
         this.content = content;
         this.createdAt = createdAt;
         this.numRespostes = numRespostes;
+        this.estat = estat;
     }
 
     public Long getMessageId() {
@@ -77,4 +79,13 @@ public class MissatgeDetailResponseDto {
     public void setRespuestaCount(int numRespostes) {
         this.numRespostes = numRespostes;
     }
+
+    public boolean isEstat() {
+        return estat;
+    }
+
+    public void setEstat(boolean estat) {
+        this.estat = estat;
+    }
+
 }
