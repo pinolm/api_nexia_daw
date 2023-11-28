@@ -5,6 +5,8 @@ import cat.nexia.spring.dto.request.UpdateUserRequestDto;
 import cat.nexia.spring.dto.response.MissatgeSimpleResponseDto;
 import cat.nexia.spring.dto.response.ResponseMessage;
 import cat.nexia.spring.dto.response.UserListResponseDto;
+import cat.nexia.spring.mail.SendMail;
+import cat.nexia.spring.mail.StringMails;
 import cat.nexia.spring.models.ERole;
 import cat.nexia.spring.models.Role;
 import cat.nexia.spring.models.User;
@@ -41,6 +43,9 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private SendMail sendMail;
 
     // Constants per als rols d'autorització i missatges d'error
     private static final String AUTHORIZATION_ROLES = "hasAnyRole('ROLE_ADMIN', 'ROLE_USER')";
@@ -265,6 +270,8 @@ public class UserController {
         }
 
         userRepository.save(user);
+        String cosEmail = StringMails.cosEmailBenvinguda(user.getId(),user.getUsername(),createUserRequest.getPassword());
+        sendMail.sendEmailHtml(user.getEmail(),null,null,"Benvingut/da a Nèxia", cosEmail );
 
         return ResponseEntity.created(ucBuilder.path("/api/users/{id}").buildAndExpand(user.getId()).toUri())
                 .body(new MissatgeSimpleResponseDto(SUCCESS_USER_CREATED));

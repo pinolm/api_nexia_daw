@@ -109,10 +109,10 @@ public class AuthController {
       return ResponseEntity.badRequest().body(new MissatgeSimpleResponseDto(ERROR_USERNAME_IN_USE));
     }
 
-    /*if (Boolean.TRUE.equals(userRepository.existsByEmail(signUpRequest.getEmail()))) {
+    if (Boolean.TRUE.equals(userRepository.existsByEmail(signUpRequest.getEmail()))) {
       return ResponseEntity.badRequest()
           .body(new MissatgeSimpleResponseDto(ERROR_EMAIL_IN_USE));
-    }*/
+    }
 
     // Crea el compte del nou usuari
     User user = new User(signUpRequest.getUsername().toLowerCase(),
