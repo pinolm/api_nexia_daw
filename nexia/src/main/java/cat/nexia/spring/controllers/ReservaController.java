@@ -120,7 +120,7 @@ public class ReservaController {
         if (!isUserAdmin) {
             int numReserves = reservaService.countReservaByDiaAndByUser(reserva);
             if (numReserves > 0) {
-                return buildErrorResponse(LIMIT_EXCEEDED, HttpStatus.OK);
+                return buildErrorResponse(LIMIT_EXCEEDED, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
         try {
