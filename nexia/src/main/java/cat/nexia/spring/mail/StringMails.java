@@ -218,14 +218,14 @@ public class StringMails {
                                 + FOOTER;
         }    
 
-                public static final String cosEmailBenvinguda(long userId, String username) {
+                public static final String cosEmailBenvinguda(long userId, String username, String password) {
                                 return HEADER +
                                 "<div class=\"cos-missatge benvinguda\">"+
                                 "    <h1>BENVINGUT A NEXIA</h1>"+
                                 "    <p>Et donem la benvinguda a la nostra comunitat!</p>"+
                                 "    <p>Aquestes son les teves dades per iniciar sessió:</p>"+
                                 "    <p>Usuari: "+ username +"</p>"+
-                                "    <p>Contrasenya: 12345678</p>"+
+                                "    <p>Contrasenya:" + password +"</p>"+
                                 "    <p class=\"ultim\">Aquesta contrasenya és generica, per aquesta raò et recomanem canviar-la abans de començar a utilitzar el servei.</p>"+
                                 "    <a class=\"btn\" href=\"http://localhost:4200/canvi-contrasenya/"+ userId + " class=\"button\">Canviar contrasenya</a>"+
                                 "</div>"
