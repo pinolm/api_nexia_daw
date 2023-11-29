@@ -2,7 +2,9 @@ package cat.nexia.spring.models;
 
 import javax.persistence.*;
 import java.io.Serializable;
-
+/**
+ Mòdel entitat Resposta corresponent a taula respostes
+ */
 @Entity
 @Table(name = "respostes")
 public class Resposta implements Serializable {

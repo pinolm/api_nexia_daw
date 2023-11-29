@@ -2,6 +2,10 @@ package cat.nexia.spring.dto.response;
 
 import java.time.LocalTime;
 
+/**
+ * POJO de la clase AllReservesByDiaResponse
+ */
+
 public class AllReservesByDiaResponse {
 
     private Long idUsuario;

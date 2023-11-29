@@ -2,6 +2,9 @@ package cat.nexia.spring.dto.response;
 
 import java.util.List;
 
+/**
+ * POJO de la clase UserInfoResponseDto
+ */
 public class UserInfoResponseDto {
     private Long id;
     private String username;

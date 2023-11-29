@@ -4,6 +4,9 @@ import cat.nexia.spring.models.User;
 
 import java.util.List;
 
+/**
+ * Interface del servei que gestiona la classe User
+ */
 public interface UserService {
 
      User getUsuariById(Long id);

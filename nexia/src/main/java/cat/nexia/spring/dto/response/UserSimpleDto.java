@@ -1,5 +1,8 @@
 package cat.nexia.spring.dto.response;
 
+/**
+ * POJO de la clase UserSimpleDto
+ */
 public class UserSimpleDto {
 
     private Long id;

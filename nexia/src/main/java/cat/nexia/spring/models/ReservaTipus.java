@@ -2,7 +2,9 @@ package cat.nexia.spring.models;
 
 import javax.persistence.*;
 import java.util.Objects;
-
+/**
+ Mòdel entitat ReservaTipus corresponent a taula reserva_tipus
+ */
 @Entity
 @Table(name = "reserva_tipus", schema = "nexia", catalog = "nexia")
 

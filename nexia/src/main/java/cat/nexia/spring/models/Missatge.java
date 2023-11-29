@@ -4,7 +4,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
+/**
+ Mòdel entitat Missatge corresponent a taula missatge
+ */
 @Entity
 @Table(name = "missatges")
 public class Missatge implements Serializable {

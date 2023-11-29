@@ -2,6 +2,10 @@ package cat.nexia.spring.dto.request;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * POJO del DTO de la classe CrearRespostaRequestDto amb els seus getters and setters
+ */
+
 public class CrearRespostaRequestDto {
 
     private Long missatgeId;
@@ -9,6 +13,7 @@ public class CrearRespostaRequestDto {
 
     @NotBlank
     private String content;
+
 
     public Long getMissatgeId() {
         return missatgeId;

@@ -4,7 +4,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
-
+/**
+ Mòdel entitat Reserva corresponent a taula reserva
+ */
 @Entity
 @Table(name = "reserva" /*, uniqueConstraints={@UniqueConstraint(columnNames={"id_pista","id_horari","dia"})}*/)
 //@SequenceGenerator(name = "reserva_id_seq", sequenceName = "reserva_id_seq", allocationSize = 1)

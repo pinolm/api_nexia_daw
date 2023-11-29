@@ -9,11 +9,21 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Implementació de la interface UserDetailService
+ */
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
   @Autowired
   UserRepository userRepository;
 
+  /**
+   * Busca en la bbdd Usuaris pel seu username
+   * @param username name de l'usuari a buscar
+   * @return UserDetails
+   * @throws UsernameNotFoundException
+   */
   @Override
   @Transactional
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

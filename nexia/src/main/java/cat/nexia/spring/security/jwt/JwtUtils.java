@@ -14,10 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 /**
- * Utility class for managing JWT tokens in security application.
- * Allows you to generate, validate and obtain JWT token information, as well as
- * manage
- * JWT related cookies.
+ * Classe d'utilitat per gestionar fitxes JWT a l'aplicació de seguretat.
+ * Permet generar, validar i obtenir informació de token JWT, així com
+ * gestionar galetes relacionades amb JWT.
  */
 @Component
 public class JwtUtils {
@@ -33,10 +32,10 @@ public class JwtUtils {
   private String jwtCookie;
 
   /**
-   * Gets the JWT token from the cookies of an HTTP request.
+   * Obté el token JWT de les galetes d'una sol·licitud HTTP.
    *
-   * @param request The HTTP request.
-   * @return The JWT token as a string, or null if not found.
+   * @param request La sol·licitud HTTP.
+   * @return El token JWT com a cadena, o nul si no es troba.
    */
   public String getJwtFromCookies(HttpServletRequest request) {
     Cookie cookie = WebUtils.getCookie(request, jwtCookie);
@@ -48,10 +47,10 @@ public class JwtUtils {
   }
 
   /**
-   * Generates a JWT cookie from the user details provided.
+   * Genera una galeta JWT a partir de les dades de l'usuari proporcionades.
    *
-   * @param userPrincipal The UserDetailsImpl object of the authenticated user.
-   * @return A ResponseCookie containing the JWT token.
+   * @param userPrincipal L'objecte UserDetailsImpl de l'usuari autenticat.
+   * @return Una ResponseCookie que conté el token JWT.
    */
   public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
     String jwt = generateTokenFromUsername(userPrincipal.getUsername());
@@ -59,9 +58,9 @@ public class JwtUtils {
   }
 
   /**
-   * Gets an empty JWT cookie, used to delete the JWT cookie.
+   * Obté una galeta JWT buida, utilitzada per eliminar la galeta JWT.
    *
-   * @return A ResponseCookie with a null value.
+   * @return Una ResponseCookie amb un valor nul.
    */
   public ResponseCookie getCleanJwtCookie() {
     ResponseCookie cookie = ResponseCookie.from(jwtCookie, null).path("/api").build();
@@ -69,20 +68,20 @@ public class JwtUtils {
   }
 
   /**
-   * Gets the username from a JWT token.
+   * Obté el nom d'usuari d'un token JWT.
    *
-   * @param token The JWT token to parse.
-   * @return The username contained in the token.
+   * @param token El token JWT per analitzar.
+   * @return El nom d'usuari contingut al token.
    */
   public String getUserNameFromJwtToken(String token) {
     return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
   }
 
   /**
-   * Validates a JWT token.
+   * Valida un token JWT.
    *
-   * @param authToken The JWT token to validate.
-   * @return true if the token is valid, false if it is not.
+   * @param authToken El token JWT a validar.
+   * @return true si el token és vàlid, false si no ho és.
    */
   public boolean validateJwtToken(String authToken) {
     try {
@@ -104,10 +103,10 @@ public class JwtUtils {
   }
 
   /**
-   * Generates a JWT token from the given username.
+   * Genera un token JWT a partir del nom d'usuari donat.
    *
-   * @param username The username for which the token is generated.
-   * @return The JWT token generated as a string.
+   * @param username d'usuari El nom d'usuari pel qual es genera el token.
+   * @return El token JWT generat com a cadena.
    */
   public String generateTokenFromUsername(String username) {
     return Jwts.builder()

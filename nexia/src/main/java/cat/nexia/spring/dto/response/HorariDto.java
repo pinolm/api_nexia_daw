@@ -1,5 +1,8 @@
 package cat.nexia.spring.dto.response;
 
+/**
+ * POJO de la clase HorariDto
+ */
 public class HorariDto {
 
     private String iniHora;

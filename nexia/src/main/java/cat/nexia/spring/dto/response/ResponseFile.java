@@ -1,5 +1,8 @@
 package cat.nexia.spring.dto.response;
 
+/**
+ * POJO de la clase ResponseFile
+ */
 public class ResponseFile {
     private String name;
     private String url;

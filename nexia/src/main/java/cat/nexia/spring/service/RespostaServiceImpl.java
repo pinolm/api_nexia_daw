@@ -11,12 +11,22 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Implementació de la interface RespostaService
+ */
 @Service
 public class RespostaServiceImpl implements RespostaService {
 
     private final RespostaRepository respuestaRepository;
     private final UserRepository userRepository;
     private final MissatgeRepository missatgeRepository;
+
+    /**
+     * Constructor de la classe, inicialitza els repositoris
+     * @param respuestaRepository repositori de Resposta
+     * @param userRepository repositori de User
+     * @param missatgeRepository repositori de Missatge
+     */
 
     @Autowired
     public RespostaServiceImpl(RespostaRepository respuestaRepository,
@@ -27,10 +37,24 @@ public class RespostaServiceImpl implements RespostaService {
         this.missatgeRepository = missatgeRepository;
     }
 
+    /**
+     * Buscar missatge per id de missatge
+     * @param missatgeId id de missatge
+     * @return una llista de Resposta
+     */
+
     @Override
     public List<Resposta> obtenerRespuestasPorMissatge(Long missatgeId) {
         return respuestaRepository.findByMissatgeId(missatgeId);
     }
+
+    /**
+     * Guardar una resposta a bbd
+     * @param missatgeId id del missatge
+     * @param userId id de l'usuari
+     * @param content contingut del missatge
+     * @return retorna una Resposta si es guarda i null en cas contrari.
+     */
 
     @Override
     public Resposta crearResposta(Long missatgeId, Long userId, String content) {
@@ -50,6 +74,12 @@ public class RespostaServiceImpl implements RespostaService {
         return null;
 
     }
+
+    /**
+     * Llista de Respostes per id de missatge
+     * @param missatgeId id de missatge
+     * @return llista de respostes
+     */
 
     @Override
     public List<Resposta> getRespuestasByMissatgeId(Long missatgeId) {

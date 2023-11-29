@@ -5,6 +5,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
+/**
+ * POJO del DTO de la clase CreateUserRequestDto
+ */
+
 public class CreateUserRequestDto {
 
     @NotBlank

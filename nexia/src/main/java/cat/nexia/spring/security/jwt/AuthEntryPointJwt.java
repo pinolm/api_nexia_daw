@@ -16,11 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Custom entry point for authentication. This class is responsible for handling
- * responses
- * in case of failed or unauthorized authentication. Generates a JSON response
- * indicating the lack of
- * authorization and provides details about the error.
+ * Punt d'entrada personalitzat per a l'autenticació. Aquesta classe s'encarrega del maneig
+ * de respostes
+ * en cas d'autenticació fallida o no autoritzada. Genera una resposta JSON
+ * indicant la manca d'autorització i proporciona detalls sobre l'error.
  */
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
@@ -28,15 +27,15 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
   private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
   /**
-   * Method that is executed when an unauthorized request is encountered or
-   * authentication fails.
+   * Mètode que s'executa quan es troba una sol·licitud no autoritzada o
+   * l'autenticació falla.
    *
-   * @param request       The incoming HTTP request.
-   * @param response      The HTTP response to generate.
-   * @param authException Authentication exception that triggered the event.
-   * @throws IOException      If an I/O error occurs while generating the
-   *                          response.
-   * @throws ServletException If an error occurs while processing the request.
+   * @param request La sol·licitud HTTP entrant.
+   * @param response La resposta HTTP a generar.
+   * @param authException Excepció d'autenticació que activa l'esdeveniment.
+   * @throws IOException Si es produeix un error d'I/O mentre es genera el fitxer
+   * de resposta.
+   * @throws ServletException Si es produeix un error en processar la sol·licitud.
    */
   @Override
   public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)

@@ -3,7 +3,9 @@ package cat.nexia.spring.models;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-
+/**
+  Mòdel entitat FileDB corresponent a taula files
+ */
 @Entity
 @Table(name = "files")
 public class FileDB {

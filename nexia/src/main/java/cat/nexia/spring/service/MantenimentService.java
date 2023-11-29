@@ -5,6 +5,10 @@ import cat.nexia.spring.models.Manteniment;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Interface del servei de manteniment
+ */
+
 public interface MantenimentService {
 
     void guardarManteniment(LocalDate dia, Long idPista);

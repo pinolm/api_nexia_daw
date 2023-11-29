@@ -2,7 +2,9 @@ package cat.nexia.spring.models;
 
 import javax.persistence.*;
 import java.io.Serializable;
-
+/**
+ Mòdel entitat Horari corresponent a taula Horari
+ */
 @Entity
 @Table(name = "horari")
 public class Horari implements Serializable {

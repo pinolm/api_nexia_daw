@@ -17,11 +17,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * JWT authentication filter that intercepts incoming requests and checks for
- * presence
- * of a valid JWT token in cookies. If a valid token is found, authenticate the
- * user
- * in the context of security.
+ * Filtre d'autenticació JWT que intercepta les sol·licituds entrants i les comprova
+ * la presència
+ * d'un testimoni JWT vàlid a les galetes. Si es troba un testimoni vàlid, autentica l'usuari
+ * en el context de la seguretat.
  */
 public class AuthTokenFilter extends OncePerRequestFilter {
   @Autowired
@@ -33,18 +32,17 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
   /**
-   * Method that runs automatically to process incoming requests and verify
-   * presence
-   * of a valid JWT token in cookies. If a valid token is found, authenticates the
-   * user in the context
-   * Application security.
+   * Mètode que s'executa automàticament per processar i verificar les sol·licituds entrants
+   * presència
+   * d'un testimoni JWT vàlid a les galetes. Si es troba un testimoni vàlid, autentica
+   * l'usuari en el context de seguretat de les aplicacions.
    *
-   * @param request     The incoming HTTP request.
-   * @param response    The HTTP response to generate.
-   * @param filterChain Filter chain to continue processing the request.
-   * @throws ServletException If an error occurs while processing the request.
-   * @throws IOException      If an I/O error occurs during processing of the
-   *                          request.
+   * @param request La sol·licitud HTTP entrant.
+   * @param response La resposta HTTP que cal generar.
+   * @param filterChain Cadena de filtres per continuar processant la sol·licitud.
+   * @throws ServletException Si es produeix un error en processar la sol·licitud.
+   * @throws IOException Si es produeix un error d'I/O durant el processament del fitxer
+   * de petició.
    */
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -72,12 +70,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   }
 
   /**
-   * Parses a JWT token from an HTTP request header.
+   * Analitza un testimoni JWT des d'una capçalera de sol·licitud HTTP.
    *
-   * @param request The incoming HTTP request from which the JWT token will be
-   *                extracted.
-   * @return The JWT token contained in the "Authorization" header of type
-   *         "Bearer", or null if no valid token is found.
+   * @param request La sol·licitud HTTP entrant de la qual serà el testimoni JWT extret.
+   * @return El testimoni JWT contingut a la capçalera del tipus "Autorització".
+   * "Portador (Bearer)", o nul si no es troba cap testimoni vàlid.
    */
   private String parseJwt(HttpServletRequest request) {
     String authorizationHeader = request.getHeader("Authorization");

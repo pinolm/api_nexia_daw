@@ -6,6 +6,9 @@ import cat.nexia.spring.models.Reserva;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Interface del servei que gestiona l'entitat Reserva
+ */
 public interface ReservaService {
 
     List<AllReservesResponseDto> findReservaByDia(LocalDate dia);

@@ -2,6 +2,10 @@ package cat.nexia.spring.dto.response;
 
 import java.util.Date;
 
+/**
+ * POJO de la clase MissatgeDetailResponseDto
+ */
+
 public class MissatgeDetailResponseDto {
 
     private Long messageId;

@@ -18,9 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * Security settings for the application.
- * Responsible for configuring authentication, authorization and session
- * management.
+ * Configuració de seguretat de l'aplicació.
+ *  Responsable de la configuració de l'autenticació, autorització i gestió de la sessió
+ *
  */
 @Configuration
 @EnableWebSecurity
@@ -36,9 +36,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthEntryPointJwt unauthorizedHandler;
 
     /**
-     * Defines a custom JWT authentication filter as a bean.
-     * 
-     * @return A JWT authentication filter.
+     * Defineix un filtre d'autenticació JWT personalitzat com a bean.
+     *
+     * @return Un filtre d'autenticació JWT.
      */
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -51,11 +51,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * Configure and expose the authentication manager as a bean.
-     * 
-     * @return An authentication manager.
-     * @throws Exception If an error occurs while configuring the authentication
-     *                   manager.
+     * Configurar i exposar el gestor d'autenticació com a bean.
+     *
+     * @return Un gestor d'autenticació.
+     * @throws Exception Si es produeix un error durant la configuració de l'autenticació manager.
+     *
      */
     @Bean
     @Override
@@ -64,9 +64,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * Set the password encoder for the app.
-     * 
-     * @return A BCrypt-based password scrambler.
+     * Estableix el codificador de contrasenya per a l'aplicació.
+     *
+     * @return Un codificador de contrasenyes basat en BCrypt.
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -84,11 +84,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     };
 
     /**
-     * Configure HTTP request security and authentication management in the
-     * application.
+     * Configura la seguretat de la sol·licitud HTTP i la gestió de l'autenticació a
+     * l'aplicació.
      *
-     * @param http The security settings for HTTP requests.
-     * @throws Exception If an error occurs during security configuration.
+     * @param http La configuració de seguretat per a les sol·licituds HTTP.
+     * @throws Exception Si es produeix un error durant la configuració de seguretat.
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {

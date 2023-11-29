@@ -5,11 +5,18 @@ import cat.nexia.spring.models.Reserva;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
+/**
+ * Classe Mapper de Reserva a ReservaDto
+ */
 public class ReservaMapper {
 
     private static final Log LOG = LogFactory.getLog(ReservaMapper.class);
 
+    /**
+     * Passa de Reserva a ReservaDto
+     * @param reserva Reserva
+     * @return retorna una ReservaDto
+     */
     public static ReservaDto toReservaDto(Reserva reserva) {
 
         if (reserva == null){

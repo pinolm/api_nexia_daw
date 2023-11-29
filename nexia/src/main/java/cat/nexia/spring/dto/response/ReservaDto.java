@@ -3,6 +3,9 @@ package cat.nexia.spring.dto.response;
 import java.time.LocalDate;
 import java.util.Objects;
 
+/**
+ * POJO de la clase ReservaDto
+ */
 public class ReservaDto {
 
     private Long idReserva;

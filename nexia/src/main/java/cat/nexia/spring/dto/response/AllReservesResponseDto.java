@@ -2,6 +2,10 @@ package cat.nexia.spring.dto.response;
 
 import java.time.LocalDate;
 
+/**
+ * POJO de la clase AllReservesResponseDto
+ */
+
 public class AllReservesResponseDto {
 
     private LocalDate dia;

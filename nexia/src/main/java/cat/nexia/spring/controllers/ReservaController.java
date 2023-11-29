@@ -281,6 +281,12 @@ public class ReservaController {
         return buildErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Comprobar si una reserva està feta per un usuari amb rol ADMIN
+     * @param reserva la reserva a consultar
+     * @return  true si la reserva fou realitzada per un ADMIN o false en cas contrari
+     */
+
 
     private boolean isUserAdmin(Reserva reserva) {
         //comprobar si l'usuari té el rol ADMIN

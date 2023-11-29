@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+/**
+ * Servei per a la gestió dels fitxers
+ */
 @Service
 public class FileStorageService {
 
@@ -19,6 +22,12 @@ public class FileStorageService {
 
     private String uuidImage;
 
+    /**
+     * Guardar una fitxer a la base de dades
+     * @param file fitxer d'entrada
+     * @return retorna una instància de FileDB del fitxer guardat
+     * @throws IOException en cas d'error llença una excepció del tipus I/O
+     */
 
     public FileDB store(MultipartFile file) throws IOException {
         if(file != null && file.getOriginalFilename()!=null){
@@ -32,6 +41,12 @@ public class FileStorageService {
             return null;
         }
     }
+
+    /**
+     * Obtenir un fitxer de la bbdd a partir del seu id
+     * @param id id del fitxer
+     * @return null si no el troba o un objecte del tipus FileDB
+     */
     public FileDB getFile(String id) {
         if(fileDBRepository.findById(id).isPresent()){
             return fileDBRepository.findById(id).get();
@@ -40,6 +55,11 @@ public class FileStorageService {
         }
 
     }
+
+    /**
+     * Obté tots els fitxers guardats a la bbdd
+     * @return llista d'objectes FileDB o llista buida en cas que no n'hi hagin.
+     */
 
     public Stream<FileDB> getAllFiles() {
         return fileDBRepository.findAll().stream();

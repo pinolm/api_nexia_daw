@@ -2,6 +2,10 @@ package cat.nexia.spring.dto.request;
 
 import javax.validation.constraints.Size;
 
+/**
+ * POJO del DTO de la clase UpdateUserRequestDto
+ */
+
 public class UpdateUserRequestDto {
 
     @Size(max = 50)

@@ -4,6 +4,9 @@ import cat.nexia.spring.models.Resposta;
 
 import java.util.List;
 
+/**
+ * Interface del servei que gestiona l'entitat Resposta
+ */
 public interface RespostaService {
 
     List<Resposta> obtenerRespuestasPorMissatge(Long missatgeId);

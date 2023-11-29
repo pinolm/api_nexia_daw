@@ -5,6 +5,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
+/**
+ * POJO del DTO de la clase RegisterRequestDto
+ */
 public class RegisterRequestDto {
     @NotBlank
     @Size(min = 3, max = 20)

@@ -2,6 +2,10 @@ package cat.nexia.spring.dto.request;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * POJO del DTO de la clase RespostaRequestDto
+ */
+
 public class RespostaRequestDto {
     
     @NotBlank

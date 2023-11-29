@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Implementació de la interface UserDetail
+ */
+
 public class UserDetailsImpl implements UserDetails {
   private static final long serialVersionUID = 1L;
 

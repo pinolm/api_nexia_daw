@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-
+/**
+ * Interface repository entitat Manteniment
+ */
 @Repository
 public interface MantenimentRepository extends JpaRepository<Manteniment, Long> {
 

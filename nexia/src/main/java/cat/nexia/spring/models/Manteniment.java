@@ -4,7 +4,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
-
+/**
+ Mòdel entitat Manteniment corresponent a taula manteniment
+ */
 @Entity
 @Table(name = "manteniment", uniqueConstraints = { @UniqueConstraint(columnNames = { "dia", "id_pista" }) })
 public class Manteniment implements Serializable {

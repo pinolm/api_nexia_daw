@@ -1,5 +1,9 @@
 package cat.nexia.spring.utils;
 
+/**
+ * Enums de l'aplicació per utilitzar com a constants
+ */
+
 public enum NexiaEnum {
     SQLEXCEPTION_MESSAGE_END(172, "final del missatge error"),
     SQLEXCEPTION(0, "PSQLException"),

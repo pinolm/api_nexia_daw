@@ -20,6 +20,10 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador del mòdul de fitxers. Sense ús.
+ */
+
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api/file")
@@ -30,6 +34,14 @@ public class FileController {
 
     @Autowired
     private UserService userService;
+
+    /**
+     * Desar un fitxer a la taula de base de dades
+     *
+     * @param file fitxer a guardar
+     * @param userId id de l'usuari autentificat
+     * @return resposta amb codi htpp i missatge
+     */
 
     @PostMapping(value ="/upload", consumes = {"multipart/form-data"})
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
@@ -47,6 +59,11 @@ public class FileController {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
         }
     }
+
+    /**
+     * Obtenir el llistat de fitxers desats a bbdd
+     * @return Llista de ResponseFile
+     */
 
     @GetMapping("/files")
     public ResponseEntity<List<ResponseFile>> getListFiles() {
@@ -66,6 +83,12 @@ public class FileController {
 
         return ResponseEntity.status(HttpStatus.OK).body(files);
     }
+
+    /**
+     * Obtenir el fitxer per id de fitxer
+     * @param id identificador del fitxer
+     * @return fitxer en byte[]
+     */
 
 
     @GetMapping("/files/{id}")

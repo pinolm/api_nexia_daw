@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 import javax.mail.internet.MimeMessage;
 import java.io.StringWriter;
 
+/**
+ * Servei per enviar emails des de Nexia
+ */
 @Service
 public class SendMail {
 
@@ -24,6 +27,15 @@ public class SendMail {
     private JavaMailSender mailSender;
 
     private static final Log LOG = LogFactory.getLog(SendMail.class);
+
+    /**
+     * Enviar email
+     * @param  to destinatari
+     * @param cc amb còpia
+     * @param cco amb còpia oculta
+     * @param asunto assumpte de l'email
+     * @param textoCorreo cos de l'email
+     */
 
     public void send(String to,String cc,String cco,String asunto,String textoCorreo) {
         SimpleMailMessage message= new SimpleMailMessage();
@@ -35,6 +47,17 @@ public class SendMail {
         LOG.info(NexiaEnum.SEND_MAIL.getPhrase() + to);
 
     }
+
+    /**
+     * Enviar email amb fitxer adjunt
+     * @param to destinatari
+     * @param cc amb còpia
+     * @param cco amb còpia oculta
+     * @param asunto assumpe de l'email
+     * @param textoCorreo cos de l'email
+     * @param nombreFichero nom del fitxer adjunt
+     * @param bytes fitxer amb byte[]
+     */
 
     public void sendWithAttach(String to,String cc,String cco,String asunto,String textoCorreo, String nombreFichero, byte[] bytes) {
 
@@ -56,6 +79,15 @@ public class SendMail {
         }
 
     }
+
+    /**
+     * enviar un email on el cos és un html
+     * @param to destinatari de l'email
+     * @param cc amb còpia
+     * @param cco amb còpia oculta
+     * @param asunto assumpte de l'email
+     * @param textoCorreo cos del correu (format html)
+     */
 
     public  void sendEmailHtml (String to,String cc,String cco,String asunto,String textoCorreo) {
         try {

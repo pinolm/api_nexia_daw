@@ -2,7 +2,9 @@ package cat.nexia.spring.models;
 
 import javax.persistence.*;
 import java.io.Serializable;
-
+/**
+ Mòdel entitat Pista corresponent a taula pista
+ */
 @Entity
 @Table(name = "pista")
 public class Pista implements Serializable {

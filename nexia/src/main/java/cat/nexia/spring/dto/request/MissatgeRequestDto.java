@@ -1,5 +1,8 @@
 package cat.nexia.spring.dto.request;
 
+/**
+ * POJO del DTO de la clase MissatgeRequestDto
+ */
 public class MissatgeRequestDto {
 
     private String title;

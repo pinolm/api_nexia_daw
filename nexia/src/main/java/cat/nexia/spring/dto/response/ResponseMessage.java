@@ -1,5 +1,8 @@
 package cat.nexia.spring.dto.response;
 
+/**
+ * POJO de la clase ResponseMessage
+ */
 public class ResponseMessage {
     private String message;
 

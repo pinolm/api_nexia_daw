@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-
+/**
+ * Interface repository entitat Reserva
+ */
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 

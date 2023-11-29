@@ -3,6 +3,9 @@ package cat.nexia.spring.utils;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+/**
+ * Classe amb utilitats transversals a l'aplicació
+ */
 public class NexiaUtils {
 
     public static String psqlException(Exception e) {

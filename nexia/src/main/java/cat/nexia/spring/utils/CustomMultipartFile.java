@@ -4,6 +4,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 
+/**
+ * Classe per gestionar els fitxers
+ */
 public class CustomMultipartFile implements MultipartFile {
     private byte[] input;
 

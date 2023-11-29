@@ -1,5 +1,8 @@
 package cat.nexia.spring.dto.response;
 
+/**
+ * POJO de la clase PistaDto
+ */
 public class PistaDto {
 
     private Integer numPista;
