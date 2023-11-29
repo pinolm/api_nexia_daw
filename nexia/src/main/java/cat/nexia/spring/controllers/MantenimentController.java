@@ -31,20 +31,15 @@ public class MantenimentController {
 
     @PostMapping("/create")
     public ResponseEntity<Object> createManteniment(@RequestParam(value = "dia") String dia,
-                                                    @RequestParam(value = "pista")String pista) {
+                                                    @RequestParam(value = "pista") String pista) {
 
         boolean isValid = GenericValidator.isDate(dia, DATE_PATTERN, true);
         if (!isValid) {
             return buildErrorResponse(DATE_PATTERN_ERROR.replace("{date}", dia), HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
             LocalDate localDate = LocalDate.parse(dia, formatter);
-            Integer countAllByDiaAndPista = mantenimentService.countAllByDiaAndPista(localDate, Long.parseLong(pista));
-            if (countAllByDiaAndPista == 0) {
-                mantenimentService.guardarManteniment(localDate, Long.parseLong(pista));
-                return new ResponseEntity<>("manteniment creat", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("manteniment duplicat. No es pot crear", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+            mantenimentService.guardarManteniment(localDate, Long.parseLong(pista));
+            return new ResponseEntity<>("manteniment creat", HttpStatus.OK);
         }
     }
 
@@ -57,7 +52,7 @@ public class MantenimentController {
             LocalDate localDate = LocalDate.parse(dia, formatter);
             List<Manteniment> allMantenimentByDia = mantenimentService.findMantenimentByDia(localDate);
             if (allMantenimentByDia.isEmpty()){
-                return new ResponseEntity<>("llista buida", HttpStatus.OK);
+                return new ResponseEntity<>("llista buida", HttpStatus.NO_CONTENT);
             } else {
                 return new ResponseEntity<>(allMantenimentByDia, HttpStatus.OK);
             }
